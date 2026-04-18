@@ -5,8 +5,8 @@ import sitemap from '@astrojs/sitemap';
 
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://swayamprakashdhoundiyal.github.io',
-  base: '/trail/',
+  site: 'https://zerostateprotocol.github.io',
+  base: '/ZEROSTATEPROTOCOL',
   integrations: [tailwind(), mdx(), sitemap()],
   output: 'static',
 });
