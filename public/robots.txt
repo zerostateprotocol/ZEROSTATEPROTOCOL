@@ -1,3 +1,3 @@
 User-agent: *
 Allow: /
-Sitemap: https://zerostateprotocol.github.io/ZEROSTATEPROTOCOL/sitemap-index.xml
+Sitemap: https://www.zerostateprotocol.com/sitemap-index.xml
