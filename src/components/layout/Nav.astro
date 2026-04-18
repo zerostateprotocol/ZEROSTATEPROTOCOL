@@ -28,7 +28,7 @@ const links = [
       <div class="hidden md:flex items-center space-x-6">
         {links.map((link) => (
           <a
-            href={`${import.meta.env.BASE_URL}${link.url}`}
+            href={`${import.meta.env.BASE_URL}${link.url.replace(/^\//, '')}`}
             class={`font-space text-sm tracking-widest transition-colors ${
               pathname.startsWith(link.url) 
                 ? 'text-brand-purpleLight font-bold' 
@@ -38,7 +38,7 @@ const links = [
             [{link.label}]
           </a>
         ))}
-        <RetroButton href={`${import.meta.env.BASE_URL}/about#contact`} class="text-sm px-4 py-2">SUBSCRIBE</RetroButton>
+        <RetroButton href={`${import.meta.env.BASE_URL}about#contact`} class="text-sm px-4 py-2">SUBSCRIBE</RetroButton>
       </div>
 
       <!-- Mobile Menu Button -->
