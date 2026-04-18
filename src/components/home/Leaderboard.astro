@@ -1,0 +1,34 @@
+---
+import SectionHeader from '../ui/SectionHeader.astro';
+import RetroCard from '../ui/RetroCard.astro';
+
+const leaders = [
+  { rank: 1, name: 'brahma', score: 154200 },
+  { rank: 2, name: '0xGhost', score: 120500 },
+  { rank: 3, name: 'null_ptr', score: 98000 },
+  { rank: 4, name: 'v0id', score: 87200 },
+  { rank: 5, name: 'cipher', score: 85000 },
+];
+---
+<div class="flex-1 w-full relative">
+  <SectionHeader label="// LEADERBOARD" heading="TOP HUNTERS" />
+  <RetroCard class="p-2 w-full overflow-x-auto">
+    <div class="min-w-[400px]">
+      <div class="bg-brand-bgHover border-b-2 border-brand-border p-3 grid grid-cols-12 gap-4 font-space text-xs text-brand-textFaint tracking-widest uppercase">
+        <div class="col-span-2 text-center">RANK</div>
+        <div class="col-span-6">HANDLE</div>
+        <div class="col-span-4 text-right">SCORE</div>
+      </div>
+      
+      <div class="flex flex-col">
+        {leaders.map((leader, i) => (
+          <div class={`grid grid-cols-12 gap-4 p-4 items-center border-b border-brand-borderDim/50 last:border-0 hover:bg-brand-bgHover/50 transition-colors ${i === 0 ? 'text-brand-purpleLight font-bold' : 'text-brand-textPrimary'}`}>
+            <div class="col-span-2 font-pixel text-center text-sm">{leader.rank}</div>
+            <div class="col-span-6 font-mono font-bold tracking-wide break-all">@{leader.name}</div>
+            <div class="col-span-4 font-mono text-right text-brand-green">${leader.score.toLocaleString()}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </RetroCard>
+</div>

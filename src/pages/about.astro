@@ -1,0 +1,113 @@
+---
+import BaseLayout from '../components/layout/BaseLayout.astro';
+import SectionHeader from '../components/ui/SectionHeader.astro';
+import ContactForm from '../components/about/ContactForm.astro';
+import RetroCard from '../components/ui/RetroCard.astro';
+
+const pgpKey = `-----BEGIN PGP PUBLIC KEY BLOCK-----
+Version: OpenPGP.js v.1.2024
+
+mQINBGBz9bEBEAC+...
+[REDACTED FOR BREVITY]
+=7x3X
+-----END PGP PUBLIC KEY BLOCK-----`;
+
+const personSchema = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": "Brahma",
+  "url": "https://brahma.dev",
+  "sameAs": [
+    "https://twitter.com/brahma",
+    "https://github.com/brahma-sec"
+  ],
+  "jobTitle": "Security Researcher & Bug Bounty Hunter",
+  "knowsAbout": ["Cybersecurity", "Bug Bounty", "Web Security", "Exploit Development"]
+});
+---
+
+<BaseLayout
+  title="About Brahma | Zero State Protocol"
+  description="Learn more about Brahma, an offensive security researcher and top-tier bug bounty hunter."
+>
+  <script type="application/ld+json" set:html={personSchema} slot="head" />
+  
+  <main class="max-w-4xl mx-auto px-4 py-24">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-12 mb-24">
+      <div class="md:col-span-1">
+        <div class="aspect-square bg-brand-bgHover border-4 border-brand-border p-2 retro-shadow-lg mb-6">
+          <div class="w-full h-full bg-brand-purple/20 flex flex-col items-center justify-center font-vhs text-brand-purple tracking-widest crt-lines gap-2">
+            <iconify-icon icon="mingcute:ghost-fill" width="64" height="64"></iconify-icon>
+            <span class="text-xl animate-pulse">NO_FACIAL_REC</span>
+          </div>
+        </div>
+        
+        <div class="font-space text-sm tracking-widest text-brand-purpleLight mb-4 font-bold border-b border-brand-border pb-2">IDENTIFICATION</div>
+        <ul class="space-y-3 font-mono text-sm text-brand-textMuted">
+          <li>ALIAS: Brahma</li>
+          <li>CLASS: Hunter</li>
+          <li>AFFILIATION: Independent</li>
+          <li>STATUS: Active</li>
+        </ul>
+      </div>
+      
+      <div class="md:col-span-2 space-y-6 lg:pl-12">
+        <SectionHeader label="// WHOAMI" heading="THE OPERATOR" class="mb-8" />
+        
+        <div class="prose prose-invert prose-purple max-w-none font-mono">
+          <p>
+            I am a full-time offensive security researcher and bug bounty hunter specializing in web application vulnerabilities, cloud infrastructure security, and undocumented exploit chains.
+          </p>
+          <p>
+            The Zero State Protocol is a methodology: approaching every target with zero assumptions about its security posture. Where others see standard functionality, I look for logic flaws, edge cases in deserialization, and complex SSRF escalations.
+          </p>
+          <p>
+            Currently holding multiple top 50 leaderboard positions across major bounty platforms. My research focuses on the intersection of cloud-native architecture, WAF bypass techniques, and subtle race conditions.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- PGP Key Block -->
+    <div class="mb-24">
+      <SectionHeader label="// SECURE COMM" heading="ENCRYPTION KEY" />
+      <RetroCard class="p-6 md:p-8">
+        <div class="flex justify-between items-center mb-4">
+          <span class="font-space text-xs text-brand-textFaint tracking-widest">RSA 4096-BIT / FINGERPRINT: 4B3A...991F</span>
+          <button id="copy-pgp" class="font-space text-xs text-brand-purpleLight hover:text-brand-purple border border-brand-border px-3 py-1 transition-colors">
+            [COPY KEY]
+          </button>
+        </div>
+        <div class="bg-brand-bgDeep border-2 border-brand-border p-4 overflow-x-auto">
+          <pre class="font-mono text-xs text-brand-green leading-relaxed" id="pgp-content">{pgpKey}</pre>
+        </div>
+      </RetroCard>
+    </div>
+
+    <!-- Contact Form -->
+    <div>
+      <SectionHeader label="// COMM LINK" heading="DIRECT TRANSMISSION" />
+      <ContactForm />
+    </div>
+  </main>
+</BaseLayout>
+
+<script>
+  const copyBtn = document.getElementById('copy-pgp');
+  const pgpContent = document.getElementById('pgp-content');
+
+  if (copyBtn && pgpContent) {
+    copyBtn.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(pgpContent.textContent || '');
+        const originalText = copyBtn.innerText;
+        copyBtn.innerText = '[COPIED!]';
+        setTimeout(() => {
+          copyBtn.innerText = originalText;
+        }, 2000);
+      } catch (err) {
+        console.error('Failed to copy text: ', err);
+      }
+    });
+  }
+</script>

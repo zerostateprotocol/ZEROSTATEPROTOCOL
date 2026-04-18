@@ -1,0 +1,17 @@
+---
+interface Props {
+  label?: string;
+  class?: string;
+}
+
+const { label, class: className = '' } = Astro.props;
+---
+<div class={`relative border-t-2 border-brand-border py-12 ${className}`}>
+  {label && (
+    <div class="absolute inset-x-0 top-0 -translate-y-1/2 flex justify-center">
+      <div class="bg-brand-bg px-4 text-brand-purpleDim font-pixel text-xs tracking-[0.5em] retro-shadow-purple pixel-border !bg-brand-bgCard">
+        {label}
+      </div>
+    </div>
+  )}
+</div>

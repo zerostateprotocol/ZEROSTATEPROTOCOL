@@ -1,0 +1,32 @@
+---
+interface Props {
+  post: any;
+}
+const { post } = Astro.props;
+const { title, description, date, category, externalUrl } = post.data;
+
+const Wrapper = externalUrl ? 'a' : 'a';
+const href = externalUrl ? externalUrl : `${import.meta.env.BASE_URL}/archive/${post.id}`;
+const target = externalUrl ? '_blank' : '';
+---
+<div class="border-b border-brand-border hover:bg-brand-bgHover/50 transition-colors group">
+  <Wrapper href={href} target={target} rel={externalUrl ? "noopener noreferrer" : ""} class="block p-6 sm:p-8">
+    <div class="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-8">
+      <div class="font-mono text-sm text-brand-textMuted whitespace-nowrap">
+        {new Date(date).toLocaleDateString()}
+      </div>
+      
+      <div class="font-space text-xs tracking-widest text-brand-purpleDim uppercase w-24">
+        [{category}]
+      </div>
+      
+      <div class="flex-grow">
+        <h3 class="font-pixel text-base sm:text-lg text-brand-textPrimary group-hover:text-brand-purpleLight transition-colors mb-2">
+          {title}
+          {externalUrl && <iconify-icon icon="mingcute:external-link-line" class="inline text-brand-purpleDim ml-2"></iconify-icon>}
+        </h3>
+        <p class="font-mono text-sm text-brand-textMuted">{description}</p>
+      </div>
+    </div>
+  </Wrapper>
+</div>

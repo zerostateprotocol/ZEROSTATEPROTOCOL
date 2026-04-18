@@ -1,0 +1,23 @@
+---
+interface Props {
+  date: Date;
+  readingTime?: number;
+}
+const { date, readingTime } = Astro.props;
+---
+<div class="flex items-center gap-4 text-xs font-mono text-brand-textMuted">
+  <div class="flex items-center gap-2">
+    <div class="w-6 h-6 bg-brand-purple pixel-border flex items-center justify-center retro-shadow">
+      <span class="text-[8px] text-brand-bg font-pixel">B</span>
+    </div>
+    <span>Brahma</span>
+  </div>
+  <span>//</span>
+  <span>{new Date(date).toLocaleDateString()}</span>
+  {readingTime && (
+    <>
+      <span>//</span>
+      <span>{readingTime} MIN READ</span>
+    </>
+  )}
+</div>

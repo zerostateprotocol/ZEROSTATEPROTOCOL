@@ -1,0 +1,29 @@
+---
+interface Props {
+  severity: 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW' | string;
+  class?: string;
+}
+
+const { severity, class: className = '' } = Astro.props;
+
+let colorStyles = '';
+switch(severity.toUpperCase()) {
+  case 'CRITICAL':
+    colorStyles = 'bg-brand-red text-brand-bg';
+    break;
+  case 'HIGH':
+    colorStyles = 'bg-brand-yellow text-brand-bg';
+    break;
+  case 'MEDIUM':
+    colorStyles = 'bg-brand-purpleDim text-brand-textPrimary';
+    break;
+  case 'LOW':
+    colorStyles = 'bg-brand-bgHover text-brand-purpleLight pixel-border';
+    break;
+  default:
+    colorStyles = 'bg-brand-bgHover text-brand-purpleLight pixel-border';
+}
+---
+<span class={`inline-block px-2 py-0.5 text-xs font-mono uppercase tracking-widest ${colorStyles} ${className}`}>
+  <slot>{severity}</slot>
+</span>

@@ -1,0 +1,26 @@
+---
+import BaseLayout from '../components/layout/BaseLayout.astro';
+import RetroButton from '../components/ui/RetroButton.astro';
+---
+
+<BaseLayout
+  title="404 Not Found | Zero State Protocol"
+  description="File not found on the server."
+>
+  <main class="min-h-[70vh] flex flex-col items-center justify-center px-4">
+    <div class="text-center max-w-2xl">
+      <h1 class="font-pixel text-6xl md:text-8xl text-brand-red mb-8 animate-glitch vhs-text leading-tight">404</h1>
+      <h2 class="font-pixel text-2xl md:text-3xl text-brand-textPrimary mb-8">FILE NOT FOUND</h2>
+      
+      <div class="bg-brand-bgHover border-2 border-brand-border p-6 font-mono text-sm text-left mb-10 text-brand-green inline-block w-full max-w-lg">
+        <p class="mb-2">Tracing connection...</p>
+        <p class="mb-2">Directory: /unknown/path/</p>
+        <p class="mb-2 text-brand-yellow">WARN: Access attempt logged.</p>
+        <p class="text-brand-red mb-4">ERR: Endpoint disabled or scrubbed.</p>
+        <p class="cursor-blink">Connection terminated.</p>
+      </div>
+      
+      <RetroButton href={import.meta.env.BASE_URL} variant="primary">RETURN TO BASE</RetroButton>
+    </div>
+  </main>
+</BaseLayout>

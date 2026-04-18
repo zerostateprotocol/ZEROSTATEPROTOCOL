@@ -1,0 +1,44 @@
+---
+import SectionHeader from '../ui/SectionHeader.astro';
+import RetroCard from '../ui/RetroCard.astro';
+
+const testimonials = [
+  {
+    quote: "Brahma's writeups are consistently top-tier. Finding SSRF chains where everyone else just sees a benign endpoint.",
+    author: "0xTib3rius",
+    role: "Senior Security Engineer"
+  },
+  {
+    quote: "The toolbox provided here has sped up my recon process by at least 40%. Clean code, no bloat.",
+    author: "R00t_M3",
+    role: "Bug Bounty Hunter"
+  },
+  {
+    quote: "Zero State Protocol is my go-to reference for WAF bypass techniques. The Unicode normalization post was legendary.",
+    author: "Alice_Crypto",
+    role: "Red Team Lead"
+  }
+];
+---
+<section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+  <SectionHeader label="// COMMENDATIONS" heading="PEER REVIEWS" />
+  
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-8 pt-8">
+    {testimonials.map((t) => (
+      <RetroCard class="p-8 flex flex-col h-full bg-brand-bgCard border-brand-purpleDim/50">
+        <div class="text-brand-purple text-4xl font-vhs mb-4">"</div>
+        <p class="font-mono text-brand-textPrimary leading-relaxed mb-8 flex-grow">{t.quote}</p>
+        
+        <div class="mt-auto flex items-center gap-4 border-t border-brand-border pt-4">
+          <div class="w-10 h-10 bg-brand-bgHover pixel-border flex items-center justify-center">
+            <iconify-icon icon="mingcute:user-4-fill" class="text-brand-textMuted"></iconify-icon>
+          </div>
+          <div>
+            <div class="font-space text-sm text-brand-purpleLight tracking-widest">{t.author}</div>
+            <div class="font-mono text-xs text-brand-textMuted">{t.role}</div>
+          </div>
+        </div>
+      </RetroCard>
+    ))}
+  </div>
+</section>

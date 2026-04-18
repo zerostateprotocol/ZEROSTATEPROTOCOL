@@ -1,0 +1,26 @@
+---
+interface Props {
+  variant?: 'primary' | 'ghost';
+  href?: string;
+  type?: 'button' | 'submit' | 'reset';
+  class?: string;
+}
+
+const { variant = 'primary', href, type, class: className = '' } = Astro.props;
+
+const baseStyles = "retro-btn px-6 py-3 font-space uppercase tracking-wider inline-block text-center cursor-pointer";
+const variantStyles = variant === 'primary' 
+  ? "bg-brand-purple text-brand-bg pixel-border" 
+  : "bg-brand-bgHover text-brand-purpleLight border-brand-purpleDim pixel-border";
+
+const classes = `${baseStyles} ${variantStyles} ${className}`;
+---
+{href ? (
+  <a href={href} class={classes}>
+    <slot />
+  </a>
+) : (
+  <button type={type} class={classes}>
+    <slot />
+  </button>
+)}

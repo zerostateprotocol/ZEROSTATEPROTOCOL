@@ -1,0 +1,52 @@
+---
+import RetroButton from '../ui/RetroButton.astro';
+
+const pathname = Astro.url.pathname;
+const links = [
+  { label: 'JOURNAL', url: '/journal' },
+  { label: 'BOUNTIES', url: '/bounties' },
+  { label: 'TOOLS', url: '/tools' },
+  { label: 'ARCHIVE', url: '/archive' },
+  { label: 'ABOUT', url: '/about' },
+];
+---
+<nav class="sticky top-0 z-40 border-b-2 border-brand-border bg-brand-bg/95 backdrop-blur-sm" role="navigation">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between items-center h-20">
+      <!-- Logo -->
+      <a href={import.meta.env.BASE_URL} class="flex items-center gap-3 group">
+        <div class="w-10 h-10 bg-brand-purple pixel-border flex items-center justify-center retro-shadow group-hover:bg-brand-purpleLight transition-colors">
+          <span class="font-pixel text-brand-bg text-sm">ZS</span>
+        </div>
+        <div class="hidden sm:flex flex-col">
+          <span class="font-pixel text-brand-textPrimary text-xs leading-tight tracking-wider">ZERO STATE</span>
+          <span class="font-pixel text-brand-purpleLight text-xs leading-tight tracking-wider">PROTOCOL</span>
+        </div>
+      </a>
+
+      <!-- Desktop Links -->
+      <div class="hidden md:flex items-center space-x-6">
+        {links.map((link) => (
+          <a
+            href={`${import.meta.env.BASE_URL}${link.url}`}
+            class={`font-space text-sm tracking-widest transition-colors ${
+              pathname.startsWith(link.url) 
+                ? 'text-brand-purpleLight font-bold' 
+                : 'text-brand-textMuted hover:text-brand-textPrimary'
+            }`}
+          >
+            [{link.label}]
+          </a>
+        ))}
+        <RetroButton href={`${import.meta.env.BASE_URL}/about#contact`} class="text-sm px-4 py-2">SUBSCRIBE</RetroButton>
+      </div>
+
+      <!-- Mobile Menu Button -->
+      <div class="md:hidden flex items-center">
+        <button id="mobile-menu-btn" class="text-brand-textPrimary p-2 focus:outline focus:outline-brand-purple cursor-pointer" aria-label="Toggle Menu" aria-expanded="false">
+          <iconify-icon icon="mingcute:menu-fill" width="28" height="28"></iconify-icon>
+        </button>
+      </div>
+    </div>
+  </div>
+</nav>

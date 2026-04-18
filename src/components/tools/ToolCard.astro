@@ -1,0 +1,27 @@
+---
+import RetroCard from '../ui/RetroCard.astro';
+import RetroButton from '../ui/RetroButton.astro';
+
+interface Props {
+  post: any;
+}
+
+const { post } = Astro.props;
+const { title, description, icon, free, downloadUrl, repoUrl } = post.data;
+---
+<RetroCard class="px-6 pb-6 pt-12 h-full flex flex-col relative mt-6">
+  <div class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 bg-brand-bgHover pixel-border flex items-center justify-center retro-shadow">
+    <iconify-icon icon={icon} width="32" height="32" class="text-brand-purple"></iconify-icon>
+  </div>
+  
+  <div class="text-center flex-grow flex flex-col">
+    {free && <div class="font-space text-[10px] text-brand-green tracking-widest mb-3 font-bold">FREE OPEN SOURCE</div>}
+    <h3 class="font-pixel text-base text-brand-textPrimary mb-3">{title}</h3>
+    <p class="font-mono text-sm text-brand-textMuted mb-6 flex-grow">{description}</p>
+    
+    <div class="flex gap-2 justify-center mt-auto">
+      {downloadUrl && <RetroButton href={downloadUrl} variant="primary" class="w-full text-xs py-2 px-2">DOWNLOAD</RetroButton>}
+      {repoUrl && <RetroButton href={repoUrl} variant="ghost" class="w-full text-xs py-2 px-2">GITHUB</RetroButton>}
+    </div>
+  </div>
+</RetroCard>

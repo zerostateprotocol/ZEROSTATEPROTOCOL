@@ -1,0 +1,66 @@
+---
+import '../../styles/global.css';
+import Nav from './Nav.astro';
+import MobileMenu from './MobileMenu.astro';
+import MarqueeBanner from './MarqueeBanner.astro';
+import Footer from './Footer.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  ogImage?: string;
+  canonical?: string;
+}
+
+const { title, description, ogImage = '/og-default.png', canonical } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="icon" type="image/x-icon" href={`${import.meta.env.BASE_URL}/favicon.ico`} />
+    <meta name="generator" content={Astro.generator} />
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Press+Start+2P&family=Space+Mono:wght@400;700&family=VT323&display=swap" rel="stylesheet" />
+    
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    {canonical && <link rel="canonical" href={canonical} />}
+    
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content={new URL(ogImage, Astro.site || 'https://brahma.dev')} />
+    
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={new URL(ogImage, Astro.site || 'https://brahma.dev')} />
+    
+    <link rel="alternate" type="application/rss+xml" href={`${import.meta.env.BASE_URL}/rss.xml`} />
+  </head>
+  <body class="bg-brand-bg text-brand-textPrimary crt-lines font-mono min-h-screen flex flex-col relative grid-bg">
+    <!-- Noise overlay -->
+    <div class="fixed inset-0 pointer-events-none z-50 mix-blend-overlay" style={`background-image: url('${import.meta.env.BASE_URL}/noise.svg'); opacity: 0.08;`}></div>
+    <!-- Scanline -->
+    <div class="fixed top-0 left-0 w-full h-1 bg-brand-purple/8 animate-scanline pointer-events-none z-50"></div>
+    
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:p-4 focus:bg-brand-purple focus:text-white z-[60]">Skip to main content</a>
+    
+    <Nav />
+    <MobileMenu />
+    <MarqueeBanner />
+    
+    <main id="main-content" class="flex-grow">
+      <slot />
+    </main>
+    
+    <Footer />
+    
+    <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
+  </body>
+</html>

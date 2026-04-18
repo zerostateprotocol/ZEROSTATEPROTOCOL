@@ -1,0 +1,33 @@
+---
+interface Props {
+  items?: string[];
+}
+
+const defaultItems = [
+  "SYSTEM NOMINAL",
+  "DEFCON 32 RECAP OUT NOW",
+  "NEW BOUNTY WRITEUP: $50K SSRF",
+  "ZERO STATE PROTOCOL ACTIVATED",
+  "NO SAFE HARBOR"
+];
+
+const { items = defaultItems } = Astro.props;
+---
+<div class="bg-brand-bgHover border-b-2 border-brand-border overflow-hidden py-1 whitespace-nowrap group">
+  <div class="inline-block animate-marquee group-hover:[animation-play-state:paused]">
+    <!-- First sequence -->
+    {items.map((item) => (
+      <span class="font-vhs text-brand-textDim text-lg mx-6 tracking-widest vhs-text">
+        {item}
+      </span>
+      <span class="text-brand-purpleDim mx-2">◆</span>
+    ))}
+    <!-- Second sequence (for smooth loop) -->
+    {items.map((item) => (
+      <span class="font-vhs text-brand-textDim text-lg mx-6 tracking-widest vhs-text">
+        {item}
+      </span>
+      <span class="text-brand-purpleDim mx-2">◆</span>
+    ))}
+  </div>
+</div>

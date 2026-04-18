@@ -1,0 +1,62 @@
+---
+import BaseLayout from '../../components/layout/BaseLayout.astro';
+import SectionHeader from '../../components/ui/SectionHeader.astro';
+import BountyCard from '../../components/bounties/BountyCard.astro';
+import { getCollection } from 'astro:content';
+
+const bounties = await getCollection('bounties', ({ data }) => !data.draft);
+bounties.sort((a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime());
+---
+
+<BaseLayout
+  title="Bug Bounty Writeups | Brahma — Zero State Protocol"
+  description="Archive of bug bounty writeups, zero-days, and critical vulnerabilities found in the wild."
+>
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+    <SectionHeader label="// HALL OF FAME" heading="BOUNTY ACHIEVED" />
+    
+    <div class="mb-12 flex flex-wrap gap-4 items-center border-b border-brand-border pb-6 font-mono text-sm">
+      <span class="text-brand-textFaint">FILTER:</span>
+      <button class="filter-btn active text-brand-purpleLight" data-filter="ALL">ALL</button>
+      <button class="filter-btn text-brand-textMuted hover:text-brand-textPrimary" data-filter="CRITICAL">CRITICAL</button>
+      <button class="filter-btn text-brand-textMuted hover:text-brand-textPrimary" data-filter="HIGH">HIGH</button>
+      <button class="filter-btn text-brand-textMuted hover:text-brand-textPrimary" data-filter="MEDIUM">MEDIUM</button>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="bounty-grid">
+      {bounties.map((bounty) => (
+        <div class="bounty-item" data-severity={bounty.data.severity}>
+          <BountyCard post={bounty} />
+        </div>
+      ))}
+    </div>
+  </main>
+</BaseLayout>
+
+<script>
+  const btns = document.querySelectorAll('.filter-btn');
+  const items = document.querySelectorAll('.bounty-item');
+
+  btns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      // Update active state
+      btns.forEach(b => {
+        b.classList.remove('active', 'text-brand-purpleLight');
+        b.classList.add('text-brand-textMuted');
+      });
+      btn.classList.add('active', 'text-brand-purpleLight');
+      btn.classList.remove('text-brand-textMuted');
+
+      // Filter items
+      const filter = (btn as HTMLElement).dataset.filter;
+      items.forEach(item => {
+        const severity = (item as HTMLElement).dataset.severity;
+        if (filter === 'ALL' || filter === severity) {
+          item.classList.remove('hidden');
+        } else {
+          item.classList.add('hidden');
+        }
+      });
+    });
+  });
+</script>

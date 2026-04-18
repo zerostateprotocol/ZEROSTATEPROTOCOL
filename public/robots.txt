@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://swayamprakashdhoundiyal.github.io/trail/sitemap-index.xml

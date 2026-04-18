@@ -1,0 +1,56 @@
+---
+const pathname = Astro.url.pathname;
+const links = [
+  { label: 'HOME', url: '/' },
+  { label: 'JOURNAL', url: '/journal' },
+  { label: 'BOUNTIES', url: '/bounties' },
+  { label: 'TOOLS', url: '/tools' },
+  { label: 'ARCHIVE', url: '/archive' },
+  { label: 'ABOUT', url: '/about' },
+];
+---
+<div id="mobile-menu" class="hidden fixed inset-0 z-50 bg-brand-bg/95 backdrop-blur-md flex-col justify-center items-center">
+  <button id="close-menu-btn" class="absolute top-6 right-6 text-brand-textPrimary p-2 focus:outline focus:outline-brand-purple cursor-pointer" aria-label="Close Menu">
+    <iconify-icon icon="mingcute:close-fill" width="32" height="32"></iconify-icon>
+  </button>
+  
+  <div class="flex flex-col space-y-6 items-center">
+    {links.map((link) => (
+      <a
+        href={import.meta.env.BASE_URL + link.url.replace(/^\//, '')}
+        class={`font-pixel text-xl tracking-widest mobile-link transition-colors ${
+          pathname === link.url || (link.url !== '/' && pathname.startsWith(link.url))
+            ? 'text-brand-purpleLight'
+            : 'text-brand-textPrimary hover:text-brand-purple'
+        }`}
+      >
+        {link.label}
+      </a>
+    ))}
+  </div>
+</div>
+
+<script>
+  const btn = document.getElementById('mobile-menu-btn');
+  const closeBtn = document.getElementById('close-menu-btn');
+  const menu = document.getElementById('mobile-menu');
+  const links = document.querySelectorAll('.mobile-link');
+
+  const toggleMenu = () => {
+    if(!menu) return;
+    const isHidden = menu.classList.contains('hidden');
+    if (isHidden) {
+      menu.classList.remove('hidden');
+      menu.classList.add('flex');
+      if(btn) btn.setAttribute('aria-expanded', 'true');
+    } else {
+      menu.classList.add('hidden');
+      menu.classList.remove('flex');
+      if(btn) btn.setAttribute('aria-expanded', 'false');
+    }
+  };
+
+  btn?.addEventListener('click', toggleMenu);
+  closeBtn?.addEventListener('click', toggleMenu);
+  links.forEach(link => link.addEventListener('click', toggleMenu));
+</script>

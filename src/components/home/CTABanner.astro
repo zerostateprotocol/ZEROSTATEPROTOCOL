@@ -1,0 +1,25 @@
+---
+import RetroCard from '../ui/RetroCard.astro';
+import RetroButton from '../ui/RetroButton.astro';
+---
+<section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+  <div class="relative">
+    <div class="absolute inset-0 bg-brand-purple/5 blur-3xl"></div>
+    <RetroCard class="p-12 md:p-20 text-center relative z-10 border-brand-purple border-dashed dashed-border">
+      <div class="inline-block bg-brand-bg px-4 py-1 mb-8 pixel-border retro-shadow">
+        <span class="font-vhs text-xl text-brand-red tracking-widest animate-pulse">WARNING: RABBIT HOLE AHEAD</span>
+      </div>
+      
+      <h2 class="font-pixel text-3xl md:text-5xl text-brand-textPrimary leading-tight mb-8">
+        READY TO <br/>
+        <span class="text-brand-purpleLight">GO DEEPER?</span>
+      </h2>
+      
+      <p class="font-mono text-lg text-brand-textMuted max-w-2xl mx-auto mb-10">
+        Join the private network to receive undocumented zero-days, exploit payloads, and advanced reconnaissance techniques.
+      </p>
+      
+      <RetroButton href={`${import.meta.env.BASE_URL}/about#contact`} variant="primary" class="text-lg px-8 py-4">INITIATE HANDSHAKE</RetroButton>
+    </RetroCard>
+  </div>
+</section>

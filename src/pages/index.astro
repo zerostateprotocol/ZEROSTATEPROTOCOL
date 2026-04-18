@@ -1,0 +1,36 @@
+---
+import BaseLayout from '../components/layout/BaseLayout.astro';
+import SectionDivider from '../components/layout/SectionDivider.astro';
+import Hero from '../components/home/Hero.astro';
+import FeaturedBounties from '../components/home/FeaturedBounties.astro';
+import FeaturedTools from '../components/home/FeaturedTools.astro';
+import Leaderboard from '../components/home/Leaderboard.astro';
+import NewsletterSignup from '../components/home/NewsletterSignup.astro';
+import Testimonials from '../components/home/Testimonials.astro';
+import CTABanner from '../components/home/CTABanner.astro';
+---
+
+<BaseLayout
+  title="Brahma | Zero State Protocol — Bug Bounty & Security Research"
+  description="Personal portfolio and security research journal of Brahma, offensive security researcher and bug bounty hunter."
+>
+  <Hero />
+  <SectionDivider label="◆ ◆ ◆" />
+  <FeaturedBounties />
+  <SectionDivider />
+  <FeaturedTools />
+  <SectionDivider />
+  
+  <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+    <div class="flex flex-col lg:flex-row gap-16">
+      <Leaderboard />
+      <NewsletterSignup />
+    </div>
+  </section>
+
+  <SectionDivider />
+  <Testimonials />
+  <SectionDivider />
+  <CTABanner />
+
+</BaseLayout>

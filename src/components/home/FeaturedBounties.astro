@@ -1,0 +1,18 @@
+---
+import SectionHeader from '../ui/SectionHeader.astro';
+import BountyFeaturedCard from '../bounties/BountyFeaturedCard.astro';
+import BountyCard from '../bounties/BountyCard.astro';
+import { getCollection } from 'astro:content';
+
+const allBounties = await getCollection('bounties', ({ data }) => !data.draft && data.featured);
+const bounties = allBounties.sort((a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime()).slice(0, 3);
+---
+<section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+  <SectionHeader label="// WALL OF FAME" heading="FEATURED BOUNTIES" />
+  
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    {bounties.map((bounty, index) => (
+      index === 0 ? <BountyFeaturedCard post={bounty} /> : <BountyCard post={bounty} />
+    ))}
+  </div>
+</section>

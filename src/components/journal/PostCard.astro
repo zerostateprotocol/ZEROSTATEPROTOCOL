@@ -1,0 +1,27 @@
+---
+import RetroCard from '../ui/RetroCard.astro';
+import PostMeta from './PostMeta.astro';
+
+interface Props {
+  post: any;
+}
+const { post } = Astro.props;
+const { title, description, date, readingTime, tags } = post.data;
+---
+<a href={`${import.meta.env.BASE_URL}/journal/${post.id}`} class="block group h-full">
+  <RetroCard class="p-8 h-full flex flex-col group-hover:border-brand-purpleDim transition-colors">
+    <div class="mb-6 flex flex-wrap gap-2">
+      {tags && tags.map((tag: string) => (
+        <span class="text-xs font-mono text-brand-purpleDim border border-brand-border px-2 py-1 bg-brand-bgHover">#{tag}</span>
+      ))}
+    </div>
+    
+    <h3 class="font-pixel text-xl text-brand-textPrimary mb-4 leading-relaxed group-hover:text-brand-purpleLight transition-colors">{title}</h3>
+    
+    <p class="font-mono text-brand-textMuted mb-8 flex-grow">{description}</p>
+    
+    <div class="mt-auto border-t border-brand-border pt-6">
+      <PostMeta date={date} readingTime={readingTime} />
+    </div>
+  </RetroCard>
+</a>
