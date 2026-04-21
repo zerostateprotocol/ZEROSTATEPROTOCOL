@@ -49,7 +49,9 @@ const terminalLines = [
       <div class="absolute -inset-4 bg-brand-purple/20 blur-3xl rounded-full"></div>
       <!-- ZSP logo as large glowing watermark, centered behind terminal -->
       <div class="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
-        <ZSPLogo size="w-80 h-80" class="opacity-10" style="filter: invert(0%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(0.4) contrast(1);" />
+        <div style="filter: invert(0%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(0.4) contrast(1);">
+          <ZSPLogo size="w-80 h-80" class="opacity-10" />
+        </div>
       </div>
       <TerminalWindow lines={terminalLines} class="relative z-10" />
     </div>
