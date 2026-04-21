@@ -1,0 +1,218 @@
+<!DOCTYPE html><html lang="en"> <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><meta name="generator" content="Astro v6.1.6"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Press+Start+2P&family=Space+Mono:wght@400;700&family=VT323&display=swap" rel="stylesheet"><title>Out-of-Scope APK in a Public S3 Bucket Led to OAuth Client Takeover — $2,000</title><meta name="description" content="Passive recon on the main domain revealed a hidden S3 asset download link during a subscription flow. The bucket contained an out-of-scope debug APK. Decompiling it exposed hardcoded OAuth credentials that worked live against production — full client impersonation confirmed."><meta property="og:title" content="Out-of-Scope APK in a Public S3 Bucket Led to OAuth Client Takeover — $2,000"><meta property="og:description" content="Passive recon on the main domain revealed a hidden S3 asset download link during a subscription flow. The bucket contained an out-of-scope debug APK. Decompiling it exposed hardcoded OAuth credentials that worked live against production — full client impersonation confirmed."><meta property="og:type" content="website"><meta property="og:image" content="https://www.zerostateprotocol.com/og-default.png"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Out-of-Scope APK in a Public S3 Bucket Led to OAuth Client Takeover — $2,000"><meta name="twitter:description" content="Passive recon on the main domain revealed a hidden S3 asset download link during a subscription flow. The bucket contained an out-of-scope debug APK. Decompiling it exposed hardcoded OAuth credentials that worked live against production — full client impersonation confirmed."><meta name="twitter:image" content="https://www.zerostateprotocol.com/og-default.png"><link rel="alternate" type="application/rss+xml" href="/rss.xml"><link rel="stylesheet" href="/_astro/BaseLayout.DR1Ar7yX.css"></head> <body class="bg-brand-bg text-brand-textPrimary crt-lines font-mono min-h-screen flex flex-col relative grid-bg"> <!-- Noise overlay --> <div class="fixed inset-0 pointer-events-none z-50 mix-blend-overlay" style="background-image: url('/noise.svg'); opacity: 0.08;"></div> <!-- Scanline --> <div class="fixed top-0 left-0 w-full h-1 bg-brand-purple/8 animate-scanline pointer-events-none z-50"></div> <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:p-4 focus:bg-brand-purple focus:text-white z-[60]">Skip to main content</a> <nav class="sticky top-0 z-40 border-b-2 border-brand-border bg-brand-bg/95 backdrop-blur-sm" role="navigation"> <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"> <div class="flex justify-between items-center h-20"> <!-- Logo --> <a href="/" class="flex items-center gap-3 group"> <div class="w-12 h-12 bg-brand-purple pixel-border flex items-center justify-center retro-shadow group-hover:bg-brand-purpleLight transition-colors p-1.5"> <img src="/logo.png" alt="Zero State Protocol" class="w-full h-full  inline-block shrink-0 object-contain"> </div> <div class="hidden sm:flex flex-col"> <span class="font-pixel text-brand-textPrimary text-xs leading-tight tracking-wider">ZERO STATE</span> <span class="font-pixel text-brand-purpleLight text-xs leading-tight tracking-wider">PROTOCOL</span> </div> </a> <!-- Desktop Links --> <div class="hidden md:flex items-center space-x-6"> <a href="/journal" class="font-space text-sm tracking-widest transition-colors text-brand-textMuted hover:text-brand-textPrimary">
+[JOURNAL]
+</a><a href="/bounties" class="font-space text-sm tracking-widest transition-colors text-brand-purpleLight font-bold">
+[BOUNTIES]
+</a><a href="/tools" class="font-space text-sm tracking-widest transition-colors text-brand-textMuted hover:text-brand-textPrimary">
+[TOOLS]
+</a><a href="/archive" class="font-space text-sm tracking-widest transition-colors text-brand-textMuted hover:text-brand-textPrimary">
+[ARCHIVE]
+</a><a href="/about" class="font-space text-sm tracking-widest transition-colors text-brand-textMuted hover:text-brand-textPrimary">
+[ABOUT]
+</a> <button class="retro-btn px-6 py-3 font-space uppercase tracking-wider inline-block text-center cursor-pointer bg-brand-purple text-brand-bg pixel-border text-sm px-4 py-2 cursor-pointer" data-newsletter-trigger="true">SUBSCRIBE</button> </div> <!-- Mobile Menu Button --> <div class="md:hidden flex items-center"> <button id="mobile-menu-btn" class="text-brand-textPrimary p-2 focus:outline focus:outline-brand-purple cursor-pointer" aria-label="Toggle Menu" aria-expanded="false"> <iconify-icon icon="mingcute:menu-fill" width="28" height="28"></iconify-icon> </button> </div> </div> </div> </nav> <div id="mobile-menu" class="hidden fixed inset-0 z-50 bg-brand-bg/95 backdrop-blur-md flex-col justify-center items-center"> <button id="close-menu-btn" class="absolute top-6 right-6 text-brand-textPrimary p-2 focus:outline focus:outline-brand-purple cursor-pointer" aria-label="Close Menu"> <iconify-icon icon="mingcute:close-fill" width="32" height="32"></iconify-icon> </button> <div class="flex flex-col space-y-6 items-center"> <a href="/" class="font-pixel text-xl tracking-widest mobile-link transition-colors text-brand-textPrimary hover:text-brand-purple"> HOME </a><a href="/journal" class="font-pixel text-xl tracking-widest mobile-link transition-colors text-brand-textPrimary hover:text-brand-purple"> JOURNAL </a><a href="/bounties" class="font-pixel text-xl tracking-widest mobile-link transition-colors text-brand-purpleLight"> BOUNTIES </a><a href="/tools" class="font-pixel text-xl tracking-widest mobile-link transition-colors text-brand-textPrimary hover:text-brand-purple"> TOOLS </a><a href="/archive" class="font-pixel text-xl tracking-widest mobile-link transition-colors text-brand-textPrimary hover:text-brand-purple"> ARCHIVE </a><a href="/about" class="font-pixel text-xl tracking-widest mobile-link transition-colors text-brand-textPrimary hover:text-brand-purple"> ABOUT </a> <button data-newsletter-trigger class="retro-btn mt-4 px-8 py-3 font-space uppercase tracking-widest bg-brand-purple text-brand-bg pixel-border hover:bg-brand-purpleLight transition-colors cursor-pointer mobile-link">
+SUBSCRIBE
+</button> </div> </div> <script type="module">const t=document.getElementById("mobile-menu-btn"),i=document.getElementById("close-menu-btn"),e=document.getElementById("mobile-menu"),d=document.querySelectorAll(".mobile-link"),n=()=>{if(!e)return;e.classList.contains("hidden")?(e.classList.remove("hidden"),e.classList.add("flex"),t&&t.setAttribute("aria-expanded","true")):(e.classList.add("hidden"),e.classList.remove("flex"),t&&t.setAttribute("aria-expanded","false"))};t?.addEventListener("click",n);i?.addEventListener("click",n);d.forEach(s=>s.addEventListener("click",n));</script> <div class="bg-brand-bgHover border-b-2 border-brand-border overflow-hidden py-1 whitespace-nowrap group"> <div class="inline-block animate-marquee group-hover:[animation-play-state:paused]"> <!-- First sequence --> <span class="font-vhs text-brand-textDim text-lg mx-6 tracking-widest vhs-text"> SYSTEM NOMINAL </span>
+      <span class="text-brand-purpleDim mx-2">◆</span><span class="font-vhs text-brand-textDim text-lg mx-6 tracking-widest vhs-text"> DEFCON 32 RECAP OUT NOW </span>
+      <span class="text-brand-purpleDim mx-2">◆</span><span class="font-vhs text-brand-textDim text-lg mx-6 tracking-widest vhs-text"> NEW BOUNTY WRITEUP: $50K SSRF </span>
+      <span class="text-brand-purpleDim mx-2">◆</span><span class="font-vhs text-brand-textDim text-lg mx-6 tracking-widest vhs-text"> ZERO STATE PROTOCOL ACTIVATED </span>
+      <span class="text-brand-purpleDim mx-2">◆</span><span class="font-vhs text-brand-textDim text-lg mx-6 tracking-widest vhs-text"> NO SAFE HARBOR </span>
+      <span class="text-brand-purpleDim mx-2">◆</span> <!-- Second sequence (for smooth loop) --> <span class="font-vhs text-brand-textDim text-lg mx-6 tracking-widest vhs-text"> SYSTEM NOMINAL </span>
+      <span class="text-brand-purpleDim mx-2">◆</span><span class="font-vhs text-brand-textDim text-lg mx-6 tracking-widest vhs-text"> DEFCON 32 RECAP OUT NOW </span>
+      <span class="text-brand-purpleDim mx-2">◆</span><span class="font-vhs text-brand-textDim text-lg mx-6 tracking-widest vhs-text"> NEW BOUNTY WRITEUP: $50K SSRF </span>
+      <span class="text-brand-purpleDim mx-2">◆</span><span class="font-vhs text-brand-textDim text-lg mx-6 tracking-widest vhs-text"> ZERO STATE PROTOCOL ACTIVATED </span>
+      <span class="text-brand-purpleDim mx-2">◆</span><span class="font-vhs text-brand-textDim text-lg mx-6 tracking-widest vhs-text"> NO SAFE HARBOR </span>
+      <span class="text-brand-purpleDim mx-2">◆</span> </div> </div> <main id="main-content" class="flex-grow">  <main class="max-w-4xl mx-auto px-4 py-16"> <div class="mb-12 border-b-2 border-brand-border pb-8"> <span class="inline-block px-2 py-0.5 text-xs font-mono uppercase tracking-widest bg-brand-yellow text-brand-bg mb-4"> HIGH </span> <h1 class="font-pixel text-3xl md:text-4xl text-brand-textPrimary leading-tight mb-6">Out-of-Scope APK in a Public S3 Bucket Led to OAuth Client Takeover — $2,000</h1> <div class="flex flex-wrap gap-4 font-mono text-sm text-brand-textMuted md:items-center"> <div class="flex items-center gap-2"> <iconify-icon icon="mingcute:calendar-fill"></iconify-icon> 4/21/2026 </div> <div class="flex items-center gap-2 text-brand-green"> <iconify-icon icon="mingcute:currency-dollar-2-fill"></iconify-icon>
+$2,000 </div> <div class="flex items-center gap-2"> <iconify-icon icon="mingcute:building-3-fill"></iconify-icon> [REDACTED] Bug Bounty Program </div> </div> <div class="mt-6 flex flex-wrap gap-2"> <span class="text-xs font-mono text-brand-purpleDim border border-brand-border px-2 py-1">#android</span><span class="text-xs font-mono text-brand-purpleDim border border-brand-border px-2 py-1">#apk</span><span class="text-xs font-mono text-brand-purpleDim border border-brand-border px-2 py-1">#s3</span><span class="text-xs font-mono text-brand-purpleDim border border-brand-border px-2 py-1">#hardcoded-secrets</span><span class="text-xs font-mono text-brand-purpleDim border border-brand-border px-2 py-1">#oauth</span><span class="text-xs font-mono text-brand-purpleDim border border-brand-border px-2 py-1">#recon</span><span class="text-xs font-mono text-brand-purpleDim border border-brand-border px-2 py-1">#out-of-scope-chain</span> </div> </div> <article class="prose prose-invert prose-purple max-w-none font-mono">  <h2 id="tldr">TL;DR</h2>
+<p>Burp was running while I walked through a subscription flow on an in-scope domain. A background request fetched a spec page that had an S3 URL in its markup. The bucket was public and listable. Inside it was a debug APK, out of scope, but it had hardcoded OAuth credentials pointing at an in-scope identity server. I used them to mint a valid Bearer token against production.</p>
+<blockquote>
+<p>The APK was out of scope. The live credentials inside it were not.</p>
+</blockquote>
+<p><strong>Bounty: $2,000</strong></p>
+<hr>
+<h2 id="finding-the-thread">Finding the Thread</h2>
+<p>I was walking a signup flow with Burp intercepting everything. Most traffic was noise. One background request stood out: the page was silently fetching a product specifications page, and that page had a raw S3 URL embedded in its markup as a download link.</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>https://[REDACTED].s3-eu-west-1.amazonaws.com/</span></span></code></pre>
+<p>Not linked anywhere visible. Only shows up if you’re watching traffic during that specific flow. Scanners miss it completely.</p>
+<hr>
+<h2 id="the-bucket">The Bucket</h2>
+<p>Hit the bucket root directly. Publicly listable, no auth required. Browsing the contents I found docs, images, and one file that immediately stood out:</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>/App/[REDACTED]-live-debug (1).apk</span></span></code></pre>
+<p>A debug build of a mobile app sitting in a public bucket. The <code>live-debug</code> filename is the tell: built against the live environment, not sanitised for distribution. The app itself wasn’t in scope. I wasn’t going to touch it. But I wanted to know what credentials it carried and whether they pointed at something that was.</p>
+<hr>
+<h2 id="decompiling">Decompiling</h2>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#B392F0">apktool</span><span style="color:#9ECBFF"> d</span><span style="color:#E1E4E8"> [REDACTED]-live-debug.apk -o decompiled/</span></span>
+<span class="line"><span style="color:#B392F0">grep</span><span style="color:#79B8FF"> -rn</span><span style="color:#9ECBFF"> "client_secret\|client_id\|api_key\|secret"</span><span style="color:#9ECBFF"> decompiled/</span></span></code></pre>
+<p><code>assets/[REDACTED]_account.conf</code>:</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>client_id     = [REDACTED]</span></span>
+<span class="line"><span>client_secret = [REDACTED]</span></span></code></pre>
+<p>Hardcoded config, bundled with the APK, sitting in a public bucket.</p>
+<hr>
+<h2 id="the-scope-argument">The Scope Argument</h2>
+<p>Before filing I mapped the full chain on paper:</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>In-scope domain</span></span>
+<span class="line"><span>  └── subscription flow (Burp intercept)</span></span>
+<span class="line"><span>        └── spec page with S3 link in markup</span></span>
+<span class="line"><span>              └── public S3 bucket</span></span>
+<span class="line"><span>                    └── out-of-scope debug APK</span></span>
+<span class="line"><span>                          └── hardcoded OAuth credentials</span></span>
+<span class="line"><span>                                └── IN-SCOPE identity server  &#x3C;-- here</span></span></code></pre>
+<p>Entry point: in-scope domain. Impact: in-scope identity server. The APK was just where the credentials happened to live. I documented this chain before filing so the triage team didn’t have to make the argument themselves.</p>
+<hr>
+<h2 id="proving-it">Proving It</h2>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="http"><code><span class="line"><span style="color:#F97583">POST</span><span style="color:#E1E4E8"> /oauth/token HTTP/2</span></span>
+<span class="line"><span style="color:#85E89D">Host</span><span style="color:#F97583">:</span><span style="color:#9ECBFF"> identity.[REDACTED].com</span></span>
+<span class="line"><span style="color:#85E89D">Content-Type</span><span style="color:#F97583">:</span><span style="color:#9ECBFF"> application/x-www-form-urlencoded</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">grant_type=client_credentials&#x26;client_id=[</span><span style="color:#FDAEB7;font-style:italic">REDACTED</span><span style="color:#E1E4E8">]&#x26;client_secret=[</span><span style="color:#FDAEB7;font-style:italic">REDACTED</span><span style="color:#E1E4E8">]</span></span></code></pre>
+<p>Server came back <code>200 OK</code> with a signed Bearer token. No friction.</p>
+<p><img src="/bounties/oauth-s3-apk/poc2.png" alt="PoC — token request with hardcoded credentials, server returns 200 and access token"></p>
+<p>Decoded the JWT to confirm it was signed by production and inspect the audience:</p>
+<p><img src="/bounties/oauth-s3-apk/poc1.png" alt="PoC — JWT decoded showing valid token issued by production identity server"></p>
+<p>With these credentials an attacker could impersonate the application in any OAuth flow that trusts this client, make authenticated requests to downstream services, and maintain access until the secret was rotated since <code>client_credentials</code> needs no user to refresh.</p>
+<hr>
+<h2 id="root-cause">Root Cause</h2>
+<p>Three things went wrong independently:</p>
+<p><strong>Credentials hardcoded in source.</strong> The <code>client_secret</code> was baked into a config file bundled with the app instead of injected at runtime. Anything that ships inside a binary is fair game.</p>
+<p><strong>Debug build stored externally.</strong> It was uploaded to S3 as a documentation asset with no access controls. Debug builds should never leave internal infrastructure.</p>
+<p><strong>Bucket publicly listable.</strong> No Block Public Access policy. Anyone with the URL could enumerate and download everything in it.</p>
+<p>Pull any one of these and the chain breaks.</p>
+<hr>
+<h2 id="timeline">Timeline</h2>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Event</th><th>Detail</th></tr></thead><tbody><tr><td>Discovery</td><td>S3 link found in intercepted traffic during signup</td></tr><tr><td>APK</td><td>Debug build found in publicly listable bucket</td></tr><tr><td>Decompile</td><td>Credentials extracted from <code>assets/</code> config</td></tr><tr><td>PoC</td><td>Live Bearer token minted, JWT decoded</td></tr><tr><td>Report</td><td>Chain documented and filed</td></tr><tr><td>Triage</td><td>Confirmed HIGH severity</td></tr><tr><td><strong>Bounty</strong></td><td><strong>$2,000</strong></td></tr><tr><td>Fix</td><td>Credentials rotated, APK removed</td></tr></tbody></table>
+<hr>
+<h2 id="fix">Fix</h2>
+<p>Rotate the exposed credentials immediately. For the long term: don’t hardcode secrets in app source, enforce Block Public Access on all S3 buckets by default, and never distribute debug builds outside internal infrastructure. A secrets scanner in CI catches this class of issue before it ships.</p>
+<hr>
+<p>The bug wasn’t in anything they were actively defending. It was in the asset they forgot existed.</p>
+<blockquote>
+<p><em>Go where the noise stops.</em></p>
+</blockquote>  </article> <div class="mt-16"> <a href="javascript:history.back()" class="font-space tracking-widest text-brand-purpleLight hover:text-brand-purple transition-colors">
+[← BACK]
+</a> </div> </main>  </main> <footer class="bg-brand-bgDeep border-t-2 border-brand-border pt-16 pb-8 mt-24"> <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"> <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12"> <div class="md:col-span-2 space-y-4"> <a href="/" class="inline-flex items-center gap-3"> <div class="w-10 h-10 bg-brand-purple pixel-border flex items-center justify-center p-1.5"> <img src="/logo.png" alt="Zero State Protocol" class="w-full h-full  inline-block shrink-0 object-contain"> </div> <span class="font-pixel text-brand-textMuted text-xs tracking-widest">ZERO STATE PROTOCOL</span> </a> <p class="font-mono text-sm text-brand-textFaint">
+Security research, bug bounty writeups, and tools from the bleeding edge.
+</p> </div> <div> <h3 class="font-space text-brand-purpleLight font-bold tracking-widest mb-4">LINKS</h3> <ul class="space-y-2 font-mono text-sm text-brand-textMuted"> <li><a href="/journal" class="hover:text-brand-purple transition-colors">Journal</a></li> <li><a href="/bounties" class="hover:text-brand-purple transition-colors">Bounties</a></li> <li><a href="/tools" class="hover:text-brand-purple transition-colors">Arsenal</a></li> <li><a href="/archive" class="hover:text-brand-purple transition-colors">Archive</a></li> </ul> </div> <div> <h3 class="font-space text-brand-purpleLight font-bold tracking-widest mb-4">SOCIAL</h3> <ul class="space-y-2 font-mono text-sm text-brand-textMuted"> <li><a href="https://x.com/ZeroStateProto" target="_blank" rel="noopener noreferrer" class="hover:text-brand-purple transition-colors flex items-center gap-2"><iconify-icon icon="ri:twitter-x-fill"></iconify-icon> Twitter / X</a></li> <li><a href="https://github.com/zerostateprotocol" target="_blank" rel="noopener noreferrer" class="hover:text-brand-purple transition-colors flex items-center gap-2"><iconify-icon icon="ri:github-fill"></iconify-icon> GitHub</a></li> <li><a href="https://in.linkedin.com/in/brahma-86a2a0169" target="_blank" rel="noopener noreferrer" class="hover:text-brand-purple transition-colors flex items-center gap-2"><iconify-icon icon="ri:linkedin-fill"></iconify-icon> LinkedIn</a></li> </ul> </div> </div> <div class="border-t border-brand-borderDim pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs font-mono text-brand-textFaint"> <p>&copy; 2026 Brahma. All rights reserved.</p> <p class="font-vhs text-lg">SYSTEM OFFLINE</p> </div> </div> </footer> <!-- Overlay --><div id="newsletter-modal" class="fixed inset-0 z-[999] flex items-center justify-center p-4 hidden" role="dialog" aria-modal="true" aria-labelledby="modal-title"> <!-- Backdrop --> <div id="modal-backdrop" class="absolute inset-0 bg-brand-bg/80 backdrop-blur-sm"></div> <!-- Modal Box --> <div class="relative z-10 w-full max-w-lg bg-brand-bgCard pixel-border retro-shadow border-2 border-brand-purple"> <!-- Top bar --> <div class="flex items-center justify-between px-5 py-3 border-b-2 border-brand-border bg-brand-bgHover"> <div class="flex items-center gap-2"> <span class="w-3 h-3 rounded-full bg-brand-red inline-block"></span> <span class="w-3 h-3 rounded-full bg-yellow-400 inline-block"></span> <span class="w-3 h-3 rounded-full bg-brand-green inline-block"></span> </div> <span class="font-space text-xs tracking-widest text-brand-textFaint">comm_link.exe</span> <button id="modal-close" class="text-brand-textFaint hover:text-brand-textPrimary transition-colors cursor-pointer" aria-label="Close"> <iconify-icon icon="mingcute:close-fill" width="18"></iconify-icon> </button> </div> <!-- Body --> <div class="p-8"> <!-- Header --> <div class="mb-6 text-center"> <div class="inline-block bg-brand-border pixel-border px-3 py-1 mb-4"> <span class="font-space text-xs tracking-widest text-brand-purpleLight">// COMM LINK</span> </div> <h2 id="modal-title" class="font-pixel text-xl text-brand-textPrimary mb-3 leading-relaxed">
+JOIN THE NETWORK
+</h2> <p class="font-mono text-sm text-brand-textMuted leading-relaxed">
+Get notified on new 0-days, writeups &amp; research.<br>No spam. Just signal.
+</p> </div> <!-- Kit Form — styled to match site theme --> <div id="kit-form-wrapper"> <form action="https://app.kit.com/forms/9347398/subscriptions" method="post" id="zsp-newsletter-form" class="space-y-4"> <!-- Honeypot --> <input type="text" name="_gotcha" style="display:none" tabindex="-1" autocomplete="off"> <div> <label for="kit-email" class="block font-space text-xs tracking-widest text-brand-purpleDim mb-2">
+SECURE ENDPOINT
+</label> <input type="email" id="kit-email" name="email_address" required placeholder="you@domain.com" class="w-full bg-brand-bg border-2 border-brand-border text-brand-textPrimary font-mono px-4 py-3 focus:outline-none focus:border-brand-purple transition-colors placeholder:text-brand-textFaint text-sm tracking-wider"> <div id="kit-email-error" class="hidden mt-2 font-mono text-xs text-brand-red animate-pulse">
+INVALID EMAIL FORMAT DETECTED
+</div> </div> <button type="submit" id="kit-submit-btn" class="retro-btn w-full px-6 py-3 font-space uppercase tracking-wider bg-brand-purple text-brand-bg pixel-border hover:bg-brand-purpleLight transition-colors cursor-pointer flex items-center justify-center gap-2"> <span id="kit-btn-text">ESTABLISH CONNECTION</span> <span id="kit-btn-spinner" class="hidden"> <iconify-icon icon="mingcute:loading-fill" width="16" class="animate-spin"></iconify-icon> </span> </button> </form> <!-- Success state --> <div id="kit-success" class="hidden text-center py-4"> <div class="font-pixel text-brand-green text-sm mb-3 leading-relaxed">
+CONNECTION SECURED
+</div> <p class="font-mono text-brand-textMuted text-xs leading-relaxed">
+Check your email to confirm.<br>Welcome to the network.
+</p> <div class="mt-4 font-mono text-xs text-brand-textFaint border border-brand-border px-4 py-3 bg-brand-bgHover"> <span class="text-brand-green">$</span> subscription --status<br> <span class="text-brand-green">▶</span> PENDING_CONFIRMATION
+</div> </div> </div> <p class="mt-4 text-center font-mono text-xs text-brand-textFaint">
+Unsubscribe at any time. No BS.
+</p> </div> </div> </div> <script>(function(){const KIT_FORM_ID = "9347398";
+
+  const modal      = document.getElementById('newsletter-modal');
+  const backdrop   = document.getElementById('modal-backdrop');
+  const closeBtn   = document.getElementById('modal-close');
+  const form       = document.getElementById('zsp-newsletter-form');
+  const emailInput = document.getElementById('kit-email');
+  const emailError = document.getElementById('kit-email-error');
+  const submitBtn  = document.getElementById('kit-submit-btn');
+  const btnText    = document.getElementById('kit-btn-text');
+  const btnSpinner = document.getElementById('kit-btn-spinner');
+  const success    = document.getElementById('kit-success');
+  const formWrapper = document.getElementById('kit-form-wrapper');
+
+  function openModal() {
+    modal.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+    setTimeout(() => emailInput?.focus(), 100);
+  }
+
+  function closeModal() {
+    modal.classList.add('hidden');
+    document.body.style.overflow = '';
+  }
+
+  // Wire all subscribe triggers (nav button + any data-newsletter-trigger)
+  function wireButtons() {
+    document.querySelectorAll('[data-newsletter-trigger]').forEach(el => {
+      el.addEventListener('click', (e) => { e.preventDefault(); openModal(); });
+    });
+  }
+  wireButtons();
+
+  backdrop?.addEventListener('click', closeModal);
+  closeBtn?.addEventListener('click', closeModal);
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeModal();
+  });
+
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = emailInput.value.trim();
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailRegex.test(email)) {
+      emailError.classList.remove('hidden');
+      return;
+    }
+    emailError.classList.add('hidden');
+
+    // Show spinner
+    btnText.textContent = 'CONNECTING...';
+    btnSpinner.classList.remove('hidden');
+    submitBtn.disabled = true;
+
+    try {
+      const formData = new FormData(form);
+      await fetch(form.action, {
+        method: 'POST',
+        body: formData,
+        mode: 'no-cors', // Kit doesn't support CORS from browser, use no-cors
+      });
+      // no-cors means we can't read response, but submission goes through
+      form.classList.add('hidden');
+      success.classList.remove('hidden');
+    } catch (err) {
+      // Fallback: submit normally
+      form.submit();
+    }
+  });
+})();</script> <script type="module" src="/_astro/BaseLayout.astro_astro_type_script_index_0_lang.BAqAPp1B.js"></script> </body> </html>
