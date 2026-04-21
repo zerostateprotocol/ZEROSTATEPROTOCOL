@@ -6,6 +6,13 @@ import { getCollection } from 'astro:content';
 
 const posts = await getCollection('journal', ({ data }) => !data.draft);
 posts.sort((a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime());
+
+const postsJson = JSON.stringify(posts.map(p => ({
+  id: p.id,
+  title: p.data.title,
+  description: p.data.description,
+  tags: p.data.tags ?? [],
+})));
 ---
 
 <BaseLayout
@@ -19,11 +26,66 @@ posts.sort((a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).get
         <iconify-icon icon="mingcute:rss-2-fill"></iconify-icon> RSS FEED
       </a>
     </div>
-    
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+
+    <!-- Search Bar -->
+    <div class="relative mb-10">
+      <div class="absolute inset-y-0 left-4 flex items-center pointer-events-none text-brand-textFaint">
+        <iconify-icon icon="mingcute:search-2-fill" width="16"></iconify-icon>
+      </div>
+      <input
+        id="journal-search"
+        type="text"
+        placeholder="SEARCH POSTS..."
+        class="w-full bg-brand-bgCard border-2 border-brand-border text-brand-textPrimary font-mono pl-10 pr-4 py-3 focus:outline-none focus:border-brand-purple transition-colors placeholder:text-brand-textFaint tracking-widest text-sm"
+      />
+      <div id="search-count" class="absolute inset-y-0 right-4 flex items-center font-mono text-xs text-brand-textFaint hidden"></div>
+    </div>
+
+    <div id="post-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
       {posts.map(post => (
-        <PostCard post={post} />
+        <div class="post-item" data-id={post.id}>
+          <PostCard post={post} />
+        </div>
       ))}
+    </div>
+
+    <div id="no-results" class="hidden text-center py-24 font-mono text-brand-textFaint">
+      <div class="text-4xl mb-4 text-brand-border">[ 0x00 ]</div>
+      <p class="text-brand-textMuted">NO RESULTS FOUND.</p>
     </div>
   </main>
 </BaseLayout>
+
+<script define:vars={{ postsJson }}>
+  const posts = JSON.parse(postsJson);
+  const input = document.getElementById('journal-search');
+  const grid = document.getElementById('post-grid');
+  const noResults = document.getElementById('no-results');
+  const countEl = document.getElementById('search-count');
+
+  input?.addEventListener('input', () => {
+    const q = input.value.toLowerCase().trim();
+    let visible = 0;
+
+    posts.forEach(post => {
+      const el = document.querySelector(`.post-item[data-id="${post.id}"]`);
+      if (!el) return;
+      const match = !q
+        || post.title.toLowerCase().includes(q)
+        || post.description.toLowerCase().includes(q)
+        || post.tags.some(t => t.toLowerCase().includes(q));
+      el.classList.toggle('hidden', !match);
+      if (match) visible++;
+    });
+
+    if (q) {
+      countEl.textContent = `${visible} RESULT${visible !== 1 ? 'S' : ''}`;
+      countEl.classList.remove('hidden');
+    } else {
+      countEl.classList.add('hidden');
+    }
+
+    noResults.classList.toggle('hidden', visible > 0 || !q);
+    grid.classList.toggle('hidden', visible === 0 && !!q);
+  });
+</script>

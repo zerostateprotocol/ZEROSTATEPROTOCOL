@@ -1,0 +1,565 @@
+---
+import SectionHeader from '../ui/SectionHeader.astro';
+import RetroCard from '../ui/RetroCard.astro';
+import { getCollection } from 'astro:content';
+
+const axioms = [
+  {
+    num: '01',
+    title: 'ZERO ASSUMPTIONS',
+    text: 'Every target is approached as if security never existed. Strip your mental model. The moment you assume something is safe, you stop looking.',
+    color: '#a855f7',
+    glow: 'rgba(168,85,247,0.10)',
+    border: 'rgba(168,85,247,0.35)',
+    tag: 'PROTOCOL_ALPHA',
+  },
+  {
+    num: '02',
+    title: 'THE CHAIN IS THE EXPLOIT',
+    text: 'A P5 info-disclosure plus a P4 IDOR plus a P3 CSRF equals a P1. Low severity is not a dead end — it is the first link. Chain everything.',
+    color: '#f43f5e',
+    glow: 'rgba(244,63,94,0.10)',
+    border: 'rgba(244,63,94,0.35)',
+    tag: 'PROTOCOL_BRAVO',
+  },
+  {
+    num: '03',
+    title: 'READ THE CODE NOT THE DOCS',
+    text: 'Documentation describes intention. Source code describes reality. The gap between those two things is where every interesting bug lives.',
+    color: '#22c55e',
+    glow: 'rgba(34,197,94,0.10)',
+    border: 'rgba(34,197,94,0.35)',
+    tag: 'PROTOCOL_CHARLIE',
+  },
+  {
+    num: '04',
+    title: 'TRUST IS THE ATTACK SURFACE',
+    text: 'Find where the system trusts user input, trusts another service, trusts a header. Every trust boundary is a potential exploit boundary.',
+    color: '#eab308',
+    glow: 'rgba(234,179,8,0.10)',
+    border: 'rgba(234,179,8,0.35)',
+    tag: 'PROTOCOL_DELTA',
+  },
+  {
+    num: '05',
+    title: 'NOISE IS CAMOUFLAGE',
+    text: 'Most hunters run the same scanners against the same endpoints. Go where the noise stops. Manual analysis of forgotten subdomains and legacy APIs pays.',
+    color: '#06b6d4',
+    glow: 'rgba(6,182,212,0.10)',
+    border: 'rgba(6,182,212,0.35)',
+    tag: 'PROTOCOL_ECHO',
+  },
+  {
+    num: '06',
+    title: 'IMPACT IS THE LANGUAGE',
+    text: 'A triage team does not care about your PoC. They care about blast radius. Demonstrate the worst-case scenario. Speak in data loss, account takeover, financial impact.',
+    color: '#c084fc',
+    glow: 'rgba(192,132,252,0.10)',
+    border: 'rgba(192,132,252,0.35)',
+    tag: 'PROTOCOL_FOXTROT',
+  },
+];
+
+// Activity feed
+const journalPosts = await getCollection('journal', ({ data }) => !data.draft);
+const bountyPosts  = await getCollection('bounties', ({ data }) => !data.draft);
+
+const journalActivity = journalPosts.map(p => ({
+  type: 'JOURNAL' as const,
+  title: p.data.title,
+  subtitle: p.data.tags?.map((t: string) => `#${t}`).join(' ') ?? '',
+  date: new Date(p.data.date),
+  href: `${import.meta.env.BASE_URL}journal/${p.id}`,
+  linkedIn: '',
+  icon: 'mingcute:pencil-fill',
+  color: 'text-brand-purple',
+}));
+
+const bountyActivity = bountyPosts.map(p => ({
+  type: 'BOUNTY' as const,
+  title: p.data.title,
+  subtitle: p.data.program ?? '',
+  date: new Date(p.data.date),
+  href: `${import.meta.env.BASE_URL}bounties/${p.id}`,
+  linkedIn: '',
+  icon: 'mingcute:bug-fill',
+  color: 'text-brand-red',
+}));
+
+const activity = [...journalActivity, ...bountyActivity]
+  .sort((a, b) => b.date.getTime() - a.date.getTime())
+  .slice(0, 7);
+
+function timeAgo(date: Date): string {
+  const days = Math.floor((Date.now() - date.getTime()) / 86400000);
+  if (days === 0) return 'today';
+  if (days === 1) return '1 day ago';
+  if (days < 7) return `${days} days ago`;
+  if (days < 14) return '1 week ago';
+  if (days < 30) return `${Math.floor(days / 7)} weeks ago`;
+  return `${Math.floor(days / 30)} months ago`;
+}
+---
+
+<section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+
+  <!-- ── OPERATOR'S PHILOSOPHY ── -->
+  <div class="mb-24">
+
+    <!-- header -->
+    <div class="flex flex-col items-center text-center mb-14">
+      <div class="philosophy-badge font-vhs text-xl tracking-widest text-brand-red px-5 py-2 mb-6 border border-brand-red/40 bg-brand-red/5 inline-block">
+        // CLASSIFIED — EYES ONLY
+      </div>
+      <h2 class="font-pixel text-2xl md:text-3xl text-brand-textPrimary leading-tight mb-5">
+        OPERATOR'S PHILOSOPHY
+      </h2>
+      <p class="font-mono text-sm text-brand-textMuted max-w-xl leading-relaxed">
+        The axioms behind the Zero State Protocol. Not rules — a mindset forged from thousands of hours on target.
+      </p>
+    </div>
+
+    <!-- scan line -->
+    <div class="scan-bar"></div>
+
+    <!-- cards -->
+    <div class="axiom-grid">
+      {axioms.map((ax, i) => (
+        <div
+          class="axiom-card"
+          style={`--ax-color:${ax.color};--ax-glow:${ax.glow};--ax-border:${ax.border};animation-delay:${i * 90}ms;`}
+        >
+          <!-- ghosted number watermark — very faint -->
+          <div class="ax-wm">{ax.num}</div>
+
+          <!-- top accent line -->
+          <div class="ax-accent"></div>
+
+          <!-- corner brackets -->
+          <div class="corner c-tl"></div>
+          <div class="corner c-tr"></div>
+          <div class="corner c-bl"></div>
+          <div class="corner c-br"></div>
+
+          <!-- meta row -->
+          <div class="ax-meta">
+            <span class="ax-tag">{ax.tag}</span>
+            <span class="ax-status">
+              <span class="ax-dot"></span><span class="ax-status-txt">ACTIVE</span>
+            </span>
+          </div>
+
+          <!-- title — glitch on hover -->
+          <h3 class="ax-title" data-text={ax.title}>{ax.title}</h3>
+
+          <!-- divider with sweep -->
+          <div class="ax-div"></div>
+
+          <!-- body — word-level glitch -->
+          <p class="ax-body" data-original={ax.text}>{ax.text}</p>
+
+          <!-- bottom row -->
+          <div class="ax-bottom">
+            <span class="ax-num-label">{ax.num}</span>
+            <span class="ax-readmore">READ_PROTOCOL →</span>
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <!-- terminal footer -->
+    <div class="term-foot">
+      <span class="tf-p">brahma@zsp:~$</span>
+      <span class="tf-c"> cat /protocols/all | grep -c "ACTIVE"</span>
+      <span class="tf-o"> 6</span>
+      <span class="tf-cur"></span>
+    </div>
+  </div>
+
+  <!-- ── RECENT ACTIVITY ── -->
+  <SectionHeader label="// LOG" heading="RECENT ACTIVITY" />
+  <RetroCard class="divide-y divide-brand-border/40">
+    {activity.map((item, i) => (
+      <div class={`flex items-start gap-4 px-6 py-5 hover:bg-brand-bgHover/40 transition-colors group ${i === 0 ? 'opacity-100' : 'opacity-85 hover:opacity-100'}`}>
+        <div class={`mt-0.5 shrink-0 ${item.color}`}>
+          <iconify-icon icon={item.icon} width="16"></iconify-icon>
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="flex flex-wrap items-center gap-2 mb-1">
+            <span class={`font-space text-xs tracking-widest px-2 py-0.5 border border-brand-border bg-brand-bgHover shrink-0 ${item.color}`}>
+              {item.type}
+            </span>
+            <a href={item.href} class="font-mono text-brand-textPrimary text-sm hover:text-brand-purpleLight transition-colors truncate">
+              {item.title}
+            </a>
+          </div>
+          {item.subtitle && (
+            <div class="font-mono text-xs text-brand-textFaint truncate">{item.subtitle}</div>
+          )}
+        </div>
+        <div class="shrink-0 flex items-center gap-3">
+          <span class="font-mono text-xs text-brand-textFaint whitespace-nowrap hidden sm:block">
+            {timeAgo(item.date)}
+          </span>
+          {item.linkedIn && (
+            <a href={item.linkedIn} target="_blank" rel="noopener noreferrer"
+               class="text-brand-textFaint hover:text-[#0A66C2] transition-colors" title="View on LinkedIn">
+              <iconify-icon icon="mingcute:linkedin-fill" width="16"></iconify-icon>
+            </a>
+          )}
+          <a href={item.href} class="text-brand-textFaint hover:text-brand-purpleLight transition-colors" aria-label="Open">
+            <iconify-icon icon="mingcute:arrow-right-fill" width="14"></iconify-icon>
+          </a>
+        </div>
+      </div>
+    ))}
+    {activity.length === 0 && (
+      <div class="px-6 py-12 text-center font-mono text-brand-textFaint text-sm">NO ACTIVITY YET</div>
+    )}
+  </RetroCard>
+</section>
+
+<style>
+/* scan bar */
+.scan-bar {
+  width: 100%; height: 2px;
+  background: linear-gradient(90deg, transparent, #a855f7, #f43f5e, #22c55e, #eab308, #06b6d4, transparent);
+  margin-bottom: 2rem;
+  position: relative; overflow: hidden;
+}
+.scan-bar::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.7) 50%, transparent 100%);
+  animation: sweep 2.5s linear infinite;
+}
+@keyframes sweep { 0%{transform:translateX(-100%)} 100%{transform:translateX(100%)} }
+
+/* grid — 2 cols on md, 3 on lg */
+.axiom-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1px;
+  background: #2d1650;
+  border: 1px solid #2d1650;
+}
+@media(min-width:640px)  { .axiom-grid { grid-template-columns: repeat(2,1fr); } }
+@media(min-width:1024px) { .axiom-grid { grid-template-columns: repeat(3,1fr); } }
+
+/* card */
+.axiom-card {
+  background: #0b0318;
+  padding: 36px 28px 28px;
+  position: relative; overflow: hidden;
+  cursor: default;
+  min-height: 320px;
+  display: flex; flex-direction: column;
+  opacity: 0; transform: translateY(20px);
+  animation: ax-in 0.5s cubic-bezier(0.16,1,0.3,1) forwards;
+  transition: background 0.25s ease, border-color 0.25s ease;
+}
+@keyframes ax-in { to { opacity:1; transform:translateY(0); } }
+.axiom-card:hover { background: var(--ax-glow); }
+
+/* ghosted number — ultra faint, large, purely decorative */
+.ax-wm {
+  position: absolute;
+  right: -12px; bottom: -20px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 110px;
+  /* extremely low opacity so it reads as texture, not label */
+  color: rgba(255,255,255,0.025);
+  line-height: 1;
+  pointer-events: none; user-select: none;
+  transition: color 0.25s;
+}
+.axiom-card:hover .ax-wm {
+  color: rgba(255,255,255,0.04);
+}
+
+/* top accent line — hidden until hover */
+.ax-accent {
+  position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: var(--ax-color);
+  transform: scaleX(0); transform-origin: left;
+  transition: transform 0.35s cubic-bezier(0.16,1,0.3,1);
+}
+.axiom-card:hover .ax-accent { transform: scaleX(1); }
+
+/* 4 corner brackets */
+.corner {
+  position: absolute;
+  width: 16px; height: 16px;
+  transition: all 0.25s ease;
+}
+.c-tl { top:12px;  left:12px;  border-top:2px solid #2d1650; border-left:2px solid #2d1650; }
+.c-tr { top:12px;  right:12px; border-top:2px solid #2d1650; border-right:2px solid #2d1650; }
+.c-bl { bottom:12px; left:12px;  border-bottom:2px solid #2d1650; border-left:2px solid #2d1650; }
+.c-br { bottom:12px; right:12px; border-bottom:2px solid #2d1650; border-right:2px solid #2d1650; }
+.axiom-card:hover .c-tl,
+.axiom-card:hover .c-tr,
+.axiom-card:hover .c-bl,
+.axiom-card:hover .c-br {
+  border-color: var(--ax-color);
+  width: 22px; height: 22px;
+}
+
+/* meta */
+.ax-meta {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 28px;
+}
+.ax-tag {
+  font-family: 'Space Mono', monospace;
+  font-size: 9px; letter-spacing: 0.15em;
+  color: #2d1650;
+  transition: color 0.25s;
+}
+.axiom-card:hover .ax-tag { color: var(--ax-color); }
+
+.ax-status {
+  display: flex; align-items: center; gap: 5px;
+  font-family: 'Space Mono', monospace;
+  font-size: 9px; letter-spacing: 0.1em;
+  color: #2d1650;
+  transition: color 0.25s;
+}
+.axiom-card:hover .ax-status { color: #22c55e; }
+.ax-dot {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: #2d1650;
+  animation: pdot 2.5s ease-in-out infinite;
+  transition: background 0.25s;
+}
+.axiom-card:hover .ax-dot { background: #22c55e; }
+@keyframes pdot { 0%,100%{opacity:1} 50%{opacity:0.2} }
+
+/* title — glitch target */
+.ax-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 13px;
+  color: #e9d5ff;
+  line-height: 1.65;
+  margin-bottom: 18px;
+  min-height: 48px;
+  transition: color 0.25s;
+  position: relative;
+}
+.axiom-card:hover .ax-title { color: #fff; }
+
+/* CSS glitch layers on title */
+.ax-title::before,
+.ax-title::after {
+  content: attr(data-text);
+  position: absolute; top: 0; left: 0;
+  font-family: inherit; font-size: inherit;
+  line-height: inherit;
+  opacity: 0;
+  pointer-events: none;
+}
+.axiom-card:hover .ax-title::before {
+  color: #f43f5e;
+  opacity: 0.7;
+  animation: glitch-top 2.5s steps(1) infinite;
+  clip-path: polygon(0 0, 100% 0, 100% 35%, 0 35%);
+}
+.axiom-card:hover .ax-title::after {
+  color: #06b6d4;
+  opacity: 0.7;
+  animation: glitch-bot 2.5s steps(1) infinite;
+  clip-path: polygon(0 65%, 100% 65%, 100% 100%, 0 100%);
+}
+@keyframes glitch-top {
+  0%,90%,100% { transform: translate(0,0); opacity: 0; }
+  91%          { transform: translate(-3px, -1px); opacity: 0.7; }
+  93%          { transform: translate(2px, 0); opacity: 0.7; }
+  95%          { transform: translate(-1px, 1px); opacity: 0; }
+}
+@keyframes glitch-bot {
+  0%,85%,100% { transform: translate(0,0); opacity: 0; }
+  86%          { transform: translate(3px, 1px); opacity: 0.7; }
+  88%          { transform: translate(-2px, 0); opacity: 0.7; }
+  90%          { transform: translate(1px, -1px); opacity: 0; }
+}
+
+/* divider */
+.ax-div {
+  height: 1px; background: #2d1650;
+  margin-bottom: 18px;
+  position: relative; overflow: hidden;
+  transition: background 0.25s;
+}
+.axiom-card:hover .ax-div { background: var(--ax-color); }
+.ax-div::after {
+  content: ''; position: absolute; top:0; left:-100%;
+  width: 50%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
+}
+.axiom-card:hover .ax-div::after { animation: shimmer 0.8s ease forwards; }
+@keyframes shimmer { to { left:150%; } }
+
+/* body */
+.ax-body {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 13px;
+  color: #6b5490;
+  line-height: 1.8;
+  flex: 1;
+  transition: color 0.25s;
+}
+.axiom-card:hover .ax-body { color: #a890c0; }
+
+/* word glitch spans injected by JS */
+.glitch-word {
+  display: inline;
+  position: relative;
+  transition: color 0.1s;
+}
+.glitch-word.scrambling { color: var(--ax-color) !important; }
+
+/* bottom row */
+.ax-bottom {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-top: 24px; padding-top: 14px;
+  border-top: 1px solid #1a0a2e;
+}
+/* num label — very dim, small, purely decorative */
+.ax-num-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: #1f0d38;
+  letter-spacing: 0.1em;
+  transition: color 0.25s;
+}
+.axiom-card:hover .ax-num-label { color: #3a1a60; }
+
+.ax-readmore {
+  font-family: 'Space Mono', monospace;
+  font-size: 9px; letter-spacing: 0.1em;
+  color: #2d1650;
+  transition: color 0.25s;
+  cursor: default;
+}
+.axiom-card:hover .ax-readmore { color: var(--ax-color); }
+
+/* terminal footer */
+.term-foot {
+  margin-top: 1px;
+  background: #080210; border: 1px solid #2d1650; border-top: none;
+  padding: 11px 20px;
+  font-family: 'IBM Plex Mono', monospace; font-size: 13px;
+  display: flex; align-items: center;
+}
+.tf-p { color: #a855f7; }
+.tf-c { color: #6b5490; }
+.tf-o { color: #22c55e; margin-left: 10px; }
+.tf-cur {
+  display: inline-block; width: 9px; height: 15px;
+  background: #a855f7; margin-left: 4px;
+  vertical-align: middle;
+  animation: blink 1s step-end infinite;
+}
+@keyframes blink { 0%,50%{opacity:1} 51%,100%{opacity:0} }
+
+/* philosophy badge */
+.philosophy-badge {
+  animation: badge-pulse 3s ease-in-out infinite;
+}
+@keyframes badge-pulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(244,63,94,0); }
+  50%      { box-shadow: 0 0 16px 4px rgba(244,63,94,0.2); }
+}
+</style>
+
+<script>
+// ── scroll-triggered entrance ──
+const cards = document.querySelectorAll<HTMLElement>('.axiom-card');
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting)
+      (e.target as HTMLElement).style.animationPlayState = 'running';
+  });
+}, { threshold: 0.08 });
+cards.forEach(c => { c.style.animationPlayState = 'paused'; obs.observe(c); });
+
+// ── title text-scramble on hover ──
+const CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ_!@#$%^&*<>?';
+cards.forEach(card => {
+  const title = card.querySelector<HTMLElement>('.ax-title');
+  if (!title) return;
+  const orig = title.dataset.text ?? title.textContent ?? '';
+  let iv: ReturnType<typeof setInterval> | null = null;
+
+  card.addEventListener('mouseenter', () => {
+    if (iv) clearInterval(iv);
+    let iter = 0;
+    iv = setInterval(() => {
+      title.textContent = orig.split('').map((c, i) => {
+        if (c === ' ') return ' ';
+        if (i < iter) return orig[i];
+        return CHARS[Math.floor(Math.random() * CHARS.length)];
+      }).join('');
+      iter += 1.5;
+      if (iter > orig.length) { clearInterval(iv!); title.textContent = orig; }
+    }, 28);
+  });
+
+  card.addEventListener('mouseleave', () => {
+    if (iv) clearInterval(iv);
+    title.textContent = orig;
+  });
+});
+
+// ── body word-level idle glitch ──
+// Wrap each word in a span, then randomly scramble a word every few seconds
+cards.forEach(card => {
+  const body = card.querySelector<HTMLElement>('.ax-body');
+  if (!body) return;
+  const color = (card as HTMLElement).style.getPropertyValue('--ax-color');
+  const originalText = body.dataset.original ?? body.textContent ?? '';
+  const words = originalText.split(' ');
+
+  // build spans
+  body.innerHTML = words.map((w, i) =>
+    `<span class="glitch-word" data-orig="${w}" data-idx="${i}">${w}</span>`
+  ).join(' ');
+
+  let glitchIv: ReturnType<typeof setInterval> | null = null;
+
+  card.addEventListener('mouseenter', () => {
+    glitchIv = setInterval(() => {
+      const spans = body.querySelectorAll<HTMLElement>('.glitch-word');
+      if (!spans.length) return;
+      // pick 1-2 random words
+      const count = Math.random() > 0.6 ? 2 : 1;
+      for (let n = 0; n < count; n++) {
+        const span = spans[Math.floor(Math.random() * spans.length)];
+        const origWord = span.dataset.orig ?? span.textContent ?? '';
+        if (origWord.length < 2) continue;
+        span.classList.add('scrambling');
+        let wIter = 0;
+        const wIv = setInterval(() => {
+          span.textContent = origWord.split('').map((c, i) => {
+            if (i < wIter) return origWord[i];
+            return CHARS[Math.floor(Math.random() * CHARS.length)];
+          }).join('');
+          wIter += 1;
+          if (wIter > origWord.length) {
+            clearInterval(wIv);
+            span.textContent = origWord;
+            span.classList.remove('scrambling');
+          }
+        }, 30);
+      }
+    }, 600);
+  });
+
+  card.addEventListener('mouseleave', () => {
+    if (glitchIv) clearInterval(glitchIv);
+    // restore all words
+    body.querySelectorAll<HTMLElement>('.glitch-word').forEach(s => {
+      s.textContent = s.dataset.orig ?? s.textContent ?? '';
+      s.classList.remove('scrambling');
+    });
+  });
+});
+</script>

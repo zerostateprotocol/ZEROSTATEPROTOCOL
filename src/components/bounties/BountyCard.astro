@@ -7,22 +7,37 @@ interface Props {
 }
 
 const { post } = Astro.props;
-const { title, severity, date, bountyAmount } = post.data;
+const { title, severity, date, bountyAmount, program } = post.data;
 ---
 <a href={`${import.meta.env.BASE_URL}bounties/${post.id}`} class="block group h-full">
   <RetroCard class="p-6 h-full flex flex-col space-y-4 transition-colors group-hover:border-brand-purpleDim">
-    <div class="flex justify-between items-start">
+    <div class="flex justify-between items-start gap-2">
       <RetroTag severity={severity} />
-      {bountyAmount && <span class="font-pixel text-xs text-brand-green">${bountyAmount.toLocaleString()}</span>}
+      {bountyAmount && <span class="font-pixel text-xs text-brand-green shrink-0">${bountyAmount.toLocaleString()}</span>}
     </div>
     
     <h3 class="font-pixel text-sm md:text-base text-brand-textPrimary leading-relaxed group-hover:text-brand-purpleLight transition-colors">
       {title}
     </h3>
-    
-    <div class="mt-auto pt-4 flex justify-between items-center font-space text-xs text-brand-textFaint tracking-widest group-hover:text-brand-purple transition-colors">
-      <span class="font-mono text-xs text-brand-textMuted group-hover:text-brand-purple">{new Date(date).toLocaleDateString()}</span>
-      <span>→</span>
+
+    <div class="flex flex-col gap-2 mt-auto">
+      {program && (
+        <div>
+          <div class="font-space text-xs text-brand-textFaint tracking-widest mb-1">PROGRAM</div>
+          <div class="font-mono text-xs text-brand-textMuted">{program}</div>
+        </div>
+      )}
+      {bountyAmount && (
+        <div>
+          <div class="font-space text-xs text-brand-textFaint tracking-widest mb-1">PAYOUT</div>
+          <div class="font-pixel text-sm text-brand-green">${bountyAmount.toLocaleString()}</div>
+        </div>
+      )}
+    </div>
+
+    <div class="pt-3 border-t border-brand-border/40 flex justify-between items-center">
+      <span class="font-mono text-xs text-brand-textMuted group-hover:text-brand-purple transition-colors">{new Date(date).toLocaleDateString()}</span>
+      <span class="font-space text-xs text-brand-textFaint group-hover:text-brand-purpleLight transition-colors">→</span>
     </div>
   </RetroCard>
 </a>

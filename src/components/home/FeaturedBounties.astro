@@ -5,14 +5,79 @@ import BountyCard from '../bounties/BountyCard.astro';
 import { getCollection } from 'astro:content';
 
 const allBounties = await getCollection('bounties', ({ data }) => !data.draft && data.featured);
-const bounties = allBounties.sort((a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime()).slice(0, 3);
+const bounties = allBounties.sort((a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime());
+
+// First bounty = big featured card (col-span-2), rest = small cards (col-span-1)
+// Pack into slides of: [featured + 1 small] per slide
+// Each slide is a 3-col grid: featured takes col 1-2, small takes col 3
+const slides: (typeof bounties)[] = [];
+let i = 0;
+while (i < bounties.length) {
+  slides.push(bounties.slice(i, i + 2)); // 1 featured + up to 1 side card
+  i += 2;
+}
+const totalSlides = slides.length;
 ---
+
 <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
   <SectionHeader label="// WALL OF FAME" heading="FEATURED BOUNTIES" />
-  
-  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-    {bounties.map((bounty, index) => (
-      index === 0 ? <BountyFeaturedCard post={bounty} /> : <BountyCard post={bounty} />
-    ))}
+
+  <div class="relative">
+    <!-- carousel viewport -->
+    <div class="overflow-hidden">
+      <div
+        id="fb-track"
+        class="flex transition-transform duration-500 ease-in-out"
+      >
+        {slides.map((slide) => (
+          <div class="fb-slide w-full flex-shrink-0">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              {slide[0] && <BountyFeaturedCard post={slide[0]} />}
+              {slide[1] && <BountyCard post={slide[1]} />}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <!-- nav — only show if more than 1 slide -->
+    {totalSlides > 1 && (
+      <div class="flex items-center justify-between mt-6 px-1">
+        <button id="fb-prev" class="font-pixel text-xs text-brand-textFaint hover:text-brand-purpleLight transition-colors px-3 py-2 border border-brand-border hover:border-brand-purple retro-shadow">◀ PREV</button>
+        <div class="flex gap-2" id="fb-dots">
+          {slides.map((_, i) => (
+            <button
+              data-idx={i}
+              class={`fb-dot w-2 h-2 border border-brand-border transition-colors ${i === 0 ? 'bg-brand-purple' : 'bg-brand-bgHover'}`}
+              aria-label={`Slide ${i + 1}`}
+            ></button>
+          ))}
+        </div>
+        <button id="fb-next" class="font-pixel text-xs text-brand-textFaint hover:text-brand-purpleLight transition-colors px-3 py-2 border border-brand-border hover:border-brand-purple retro-shadow">NEXT ▶</button>
+      </div>
+    )}
   </div>
 </section>
+
+<script>
+  const track  = document.getElementById('fb-track') as HTMLElement | null;
+  const dots   = document.querySelectorAll<HTMLElement>('.fb-dot');
+  const prev   = document.getElementById('fb-prev');
+  const next   = document.getElementById('fb-next');
+  if (!track) throw new Error('fb-track not found');
+  const total  = Math.max(dots.length, 1);
+  let current  = 0;
+
+  function goTo(idx: number) {
+    current = ((idx % total) + total) % total;
+    track!.style.transform = `translateX(-${current * 100}%)`;
+    dots.forEach((d, i) => {
+      d.classList.toggle('bg-brand-purple',  i === current);
+      d.classList.toggle('bg-brand-bgHover', i !== current);
+    });
+  }
+
+  prev?.addEventListener('click', () => goTo(current - 1));
+  next?.addEventListener('click', () => goTo(current + 1));
+  dots.forEach(d => d.addEventListener('click', () => goTo(Number(d.dataset.idx))));
+</script>

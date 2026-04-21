@@ -4,14 +4,80 @@ import ToolCard from '../tools/ToolCard.astro';
 import { getCollection } from 'astro:content';
 
 const allTools = await getCollection('tools', ({ data }) => data.featured);
-const tools = allTools.slice(0, 4);
+// Show up to 8 tools, 4 per slide
+const tools = allTools.slice(0, 8);
+
+// Split into pages of 4
+function chunks<T>(arr: T[], size: number): T[][] {
+  const result: T[][] = [];
+  for (let i = 0; i < arr.length; i += size) result.push(arr.slice(i, i + size));
+  return result;
+}
+const pages = chunks(tools, 4);
+const pageCount = pages.length;
 ---
+
 <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
-  <SectionHeader label="// ARSENAL" heading="FEATURED TOOLS" />
-  
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-16 pt-8">
-    {tools.map(tool => (
-      <ToolCard post={tool} />
-    ))}
+  <div class="flex flex-col items-center text-center mb-12">
+    <div class="inline-block bg-brand-border pixel-border retro-shadow px-4 py-1 mb-6">
+      <span class="font-vhs text-2xl text-brand-purpleLight tracking-widest">// ARSENAL</span>
+    </div>
+    <h2 class="font-pixel text-2xl md:text-3xl text-brand-textPrimary leading-tight">FEATURED TOOLS</h2>
   </div>
+
+  <!-- carousel viewport -->
+  <div class="relative overflow-hidden">
+    <div
+      id="ft-track"
+      class="flex transition-transform duration-400 ease-in-out"
+      style="width: 100%;"
+    >
+      {pages.map((page) => (
+        <div class="ft-slide grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-16 pt-8 flex-shrink-0" style="width:100%;">
+          {page.map(tool => (
+            <ToolCard post={tool} />
+          ))}
+        </div>
+      ))}
+    </div>
+  </div>
+
+  {pageCount > 1 && (
+    <!-- nav -->
+    <div class="flex items-center justify-center gap-6 mt-10">
+      <button id="ft-prev" aria-label="Previous tools" class="font-pixel text-xs text-brand-textFaint hover:text-brand-purpleLight transition-colors px-3 py-2 border border-brand-border hover:border-brand-purple retro-shadow">◀ PREV</button>
+      <div class="flex gap-2" id="ft-dots">
+        {pages.map((_, i) => (
+          <button
+            data-idx={i}
+            aria-label={`Tools page ${i + 1}`}
+            class={`ft-dot w-2 h-2 border border-brand-border transition-colors ${i === 0 ? 'bg-brand-purple' : 'bg-brand-bgHover'}`}
+          ></button>
+        ))}
+      </div>
+      <button id="ft-next" aria-label="Next tools" class="font-pixel text-xs text-brand-textFaint hover:text-brand-purpleLight transition-colors px-3 py-2 border border-brand-border hover:border-brand-purple retro-shadow">NEXT ▶</button>
+    </div>
+  )}
 </section>
+
+<script>
+  const track = document.getElementById('ft-track') as HTMLElement;
+  const dots  = document.querySelectorAll<HTMLElement>('.ft-dot');
+  const prev  = document.getElementById('ft-prev');
+  const next  = document.getElementById('ft-next');
+  const total = dots.length;
+  let current = 0;
+
+  function goTo(idx: number) {
+    current = (idx + total) % total;
+    track.style.transform = `translateX(-${current * 100}%)`;
+    dots.forEach((d, i) => {
+      d.classList.toggle('bg-brand-purple',  i === current);
+      d.classList.toggle('bg-brand-bgHover', i !== current);
+    });
+  }
+
+  prev?.addEventListener('click', () => goTo(current - 1));
+  next?.addEventListener('click', () => goTo(current + 1));
+  dots.forEach(d => d.addEventListener('click', () => goTo(Number(d.dataset.idx))));
+</script>

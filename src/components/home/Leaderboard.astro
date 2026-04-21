@@ -3,32 +3,89 @@ import SectionHeader from '../ui/SectionHeader.astro';
 import RetroCard from '../ui/RetroCard.astro';
 
 const leaders = [
-  { rank: 1, name: 'brahma', score: 154200 },
-  { rank: 2, name: '0xGhost', score: 120500 },
-  { rank: 3, name: 'null_ptr', score: 98000 },
-  { rank: 4, name: 'v0id', score: 87200 },
-  { rank: 5, name: 'cipher', score: 85000 },
+  { rank: 1,  name: 'brahma',     score: 154200 },
+  { rank: 2,  name: '0xGhost',    score: 120500 },
+  { rank: 3,  name: 'null_ptr',   score: 98000  },
+  { rank: 4,  name: 'v0id',       score: 87200  },
+  { rank: 5,  name: 'cipher',     score: 85000  },
+  { rank: 6,  name: 'ex_nihilo',  score: 79400  },
+  { rank: 7,  name: 'hexbyte',    score: 73100  },
+  { rank: 8,  name: 'segfault',   score: 68900  },
+  { rank: 9,  name: 'r00tkit',    score: 64300  },
+  { rank: 10, name: 'overflow_',  score: 59800  },
 ];
+
+// Split into pages of 5
+const pages = [leaders.slice(0, 5), leaders.slice(5, 10)];
 ---
+
 <div class="flex-1 w-full relative">
   <SectionHeader label="// LEADERBOARD" heading="TOP HUNTERS" />
-  <RetroCard class="p-2 w-full overflow-x-auto">
-    <div class="min-w-[400px]">
-      <div class="bg-brand-bgHover border-b-2 border-brand-border p-3 grid grid-cols-12 gap-4 font-space text-xs text-brand-textFaint tracking-widest uppercase">
-        <div class="col-span-2 text-center">RANK</div>
-        <div class="col-span-6">HANDLE</div>
-        <div class="col-span-4 text-right">SCORE</div>
+
+  <!-- carousel wrapper -->
+  <div class="relative">
+    <RetroCard class="p-2 w-full overflow-hidden">
+      <div class="min-w-[400px]">
+        <!-- header row -->
+        <div class="bg-brand-bgHover border-b-2 border-brand-border p-3 grid grid-cols-12 gap-4 font-space text-xs text-brand-textFaint tracking-widest uppercase">
+          <div class="col-span-2 text-center">RANK</div>
+          <div class="col-span-6">HANDLE</div>
+          <div class="col-span-4 text-right">SCORE</div>
+        </div>
+
+        <!-- slides -->
+        <div id="lb-track" class="transition-transform duration-400 ease-in-out" style="display:grid; grid-template-columns: repeat(2, 100%); width: 200%; transform: translateX(0%);">
+          {pages.map((page) => (
+            <div style="width:100%;">
+              {page.map((leader, i) => (
+                <div class={`grid grid-cols-12 gap-4 p-4 items-center border-b border-brand-borderDim/50 last:border-0 hover:bg-brand-bgHover/50 transition-colors ${leader.rank === 1 ? 'text-brand-purpleLight font-bold' : 'text-brand-textPrimary'}`}>
+                  <div class="col-span-2 font-pixel text-center text-sm">{leader.rank}</div>
+                  <div class="col-span-6 font-mono font-bold tracking-wide break-all">@{leader.name}</div>
+                  <div class="col-span-4 font-mono text-right text-brand-green">${leader.score.toLocaleString()}</div>
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
       </div>
-      
-      <div class="flex flex-col">
-        {leaders.map((leader, i) => (
-          <div class={`grid grid-cols-12 gap-4 p-4 items-center border-b border-brand-borderDim/50 last:border-0 hover:bg-brand-bgHover/50 transition-colors ${i === 0 ? 'text-brand-purpleLight font-bold' : 'text-brand-textPrimary'}`}>
-            <div class="col-span-2 font-pixel text-center text-sm">{leader.rank}</div>
-            <div class="col-span-6 font-mono font-bold tracking-wide break-all">@{leader.name}</div>
-            <div class="col-span-4 font-mono text-right text-brand-green">${leader.score.toLocaleString()}</div>
-          </div>
+    </RetroCard>
+
+    <!-- nav dots + arrows -->
+    <div class="flex items-center justify-between mt-3 px-1">
+      <button id="lb-prev" aria-label="Previous" class="font-pixel text-xs text-brand-textFaint hover:text-brand-purpleLight transition-colors px-2 py-1 border border-brand-border hover:border-brand-purple retro-shadow">◀ PREV</button>
+      <div class="flex gap-2" id="lb-dots">
+        {pages.map((_, i) => (
+          <button
+            data-idx={i}
+            aria-label={`Page ${i + 1}`}
+            class={`lb-dot w-2 h-2 border border-brand-border transition-colors ${i === 0 ? 'bg-brand-purple' : 'bg-brand-bgHover'}`}
+          ></button>
         ))}
       </div>
+      <button id="lb-next" aria-label="Next" class="font-pixel text-xs text-brand-textFaint hover:text-brand-purpleLight transition-colors px-2 py-1 border border-brand-border hover:border-brand-purple retro-shadow">NEXT ▶</button>
     </div>
-  </RetroCard>
+  </div>
 </div>
+
+<script>
+  const track  = document.getElementById('lb-track') as HTMLElement;
+  const dots   = document.querySelectorAll<HTMLElement>('.lb-dot');
+  const prev   = document.getElementById('lb-prev')!;
+  const next   = document.getElementById('lb-next')!;
+  const total  = dots.length;
+  let current  = 0;
+
+  function goTo(idx: number) {
+    current = (idx + total) % total;
+    track.style.transform = `translateX(-${current * (100 / total)}%)`;
+    dots.forEach((d, i) => {
+      d.style.background = i === current ? 'var(--tw-color-brand-purple, #a855f7)' : '';
+      d.classList.toggle('bg-brand-purple', i === current);
+      d.classList.toggle('bg-brand-bgHover', i !== current);
+    });
+  }
+
+  prev.addEventListener('click', () => goTo(current - 1));
+  next.addEventListener('click', () => goTo(current + 1));
+  dots.forEach(d => d.addEventListener('click', () => goTo(Number(d.dataset.idx))));
+</script>

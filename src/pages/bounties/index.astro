@@ -6,6 +6,12 @@ import { getCollection } from 'astro:content';
 
 const bounties = await getCollection('bounties', ({ data }) => !data.draft);
 bounties.sort((a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime());
+
+const bountiesJson = JSON.stringify(bounties.map(b => ({
+  id: b.id,
+  title: b.data.title,
+  severity: b.data.severity,
+})));
 ---
 
 <BaseLayout
@@ -14,49 +20,96 @@ bounties.sort((a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).
 >
   <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
     <SectionHeader label="// HALL OF FAME" heading="BOUNTY ACHIEVED" />
-    
-    <div class="mb-12 flex flex-wrap gap-4 items-center border-b border-brand-border pb-6 font-mono text-sm">
-      <span class="text-brand-textFaint">FILTER:</span>
-      <button class="filter-btn active text-brand-purpleLight" data-filter="ALL">ALL</button>
-      <button class="filter-btn text-brand-textMuted hover:text-brand-textPrimary" data-filter="CRITICAL">CRITICAL</button>
-      <button class="filter-btn text-brand-textMuted hover:text-brand-textPrimary" data-filter="HIGH">HIGH</button>
-      <button class="filter-btn text-brand-textMuted hover:text-brand-textPrimary" data-filter="MEDIUM">MEDIUM</button>
+
+    <!-- Search + Filter row -->
+    <div class="mb-10 flex flex-col sm:flex-row gap-4">
+      <!-- Search -->
+      <div class="relative flex-1">
+        <div class="absolute inset-y-0 left-4 flex items-center pointer-events-none text-brand-textFaint">
+          <iconify-icon icon="mingcute:search-2-fill" width="16"></iconify-icon>
+        </div>
+        <input
+          id="bounty-search"
+          type="text"
+          placeholder="SEARCH BOUNTIES..."
+          class="w-full bg-brand-bgCard border-2 border-brand-border text-brand-textPrimary font-mono pl-10 pr-4 py-3 focus:outline-none focus:border-brand-purple transition-colors placeholder:text-brand-textFaint tracking-widest text-sm"
+        />
+        <div id="search-count" class="absolute inset-y-0 right-4 flex items-center font-mono text-xs text-brand-textFaint hidden"></div>
+      </div>
+
+      <!-- Filter buttons -->
+      <div class="flex flex-wrap gap-3 items-center border border-brand-border px-4 py-2 font-mono text-sm bg-brand-bgCard shrink-0">
+        <span class="text-brand-textFaint text-xs tracking-widest">SEVERITY:</span>
+        <button class="filter-btn active text-brand-purpleLight" data-filter="ALL">ALL</button>
+        <button class="filter-btn text-brand-textMuted hover:text-brand-textPrimary" data-filter="CRITICAL">CRITICAL</button>
+        <button class="filter-btn text-brand-textMuted hover:text-brand-textPrimary" data-filter="HIGH">HIGH</button>
+        <button class="filter-btn text-brand-textMuted hover:text-brand-textPrimary" data-filter="MEDIUM">MEDIUM</button>
+      </div>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="bounty-grid">
       {bounties.map((bounty) => (
-        <div class="bounty-item" data-severity={bounty.data.severity}>
+        <div class="bounty-item" data-severity={bounty.data.severity} data-id={bounty.id}>
           <BountyCard post={bounty} />
         </div>
       ))}
     </div>
+
+    <div id="no-results" class="hidden text-center py-24 font-mono text-brand-textFaint">
+      <div class="text-4xl mb-4 text-brand-border">[ 0x00 ]</div>
+      <p class="text-brand-textMuted">NO RESULTS FOUND.</p>
+    </div>
   </main>
 </BaseLayout>
 
-<script>
+<script define:vars={{ bountiesJson }}>
+  const bounties = JSON.parse(bountiesJson);
+  const searchInput = document.getElementById('bounty-search');
   const btns = document.querySelectorAll('.filter-btn');
-  const items = document.querySelectorAll('.bounty-item');
+  const grid = document.getElementById('bounty-grid');
+  const noResults = document.getElementById('no-results');
+  const countEl = document.getElementById('search-count');
+
+  let activeFilter = 'ALL';
+
+  function applyFilters() {
+    const q = searchInput.value.toLowerCase().trim();
+    let visible = 0;
+
+    bounties.forEach(bounty => {
+      const el = document.querySelector(`.bounty-item[data-id="${bounty.id}"]`);
+      if (!el) return;
+      const matchesSeverity = activeFilter === 'ALL' || bounty.severity === activeFilter;
+      const matchesSearch = !q || bounty.title.toLowerCase().includes(q);
+      const show = matchesSeverity && matchesSearch;
+      el.classList.toggle('hidden', !show);
+      if (show) visible++;
+    });
+
+    if (q) {
+      countEl.textContent = `${visible} RESULT${visible !== 1 ? 'S' : ''}`;
+      countEl.classList.remove('hidden');
+    } else {
+      countEl.classList.add('hidden');
+    }
+
+    const isEmpty = visible === 0;
+    noResults.classList.toggle('hidden', !isEmpty);
+    grid.classList.toggle('hidden', isEmpty);
+  }
 
   btns.forEach(btn => {
     btn.addEventListener('click', () => {
-      // Update active state
       btns.forEach(b => {
         b.classList.remove('active', 'text-brand-purpleLight');
         b.classList.add('text-brand-textMuted');
       });
       btn.classList.add('active', 'text-brand-purpleLight');
       btn.classList.remove('text-brand-textMuted');
-
-      // Filter items
-      const filter = (btn as HTMLElement).dataset.filter;
-      items.forEach(item => {
-        const severity = (item as HTMLElement).dataset.severity;
-        if (filter === 'ALL' || filter === severity) {
-          item.classList.remove('hidden');
-        } else {
-          item.classList.add('hidden');
-        }
-      });
+      activeFilter = btn.dataset.filter;
+      applyFilters();
     });
   });
+
+  searchInput?.addEventListener('input', applyFilters);
 </script>

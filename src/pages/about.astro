@@ -4,14 +4,6 @@ import SectionHeader from '../components/ui/SectionHeader.astro';
 import ContactForm from '../components/about/ContactForm.astro';
 import RetroCard from '../components/ui/RetroCard.astro';
 
-const pgpKey = `-----BEGIN PGP PUBLIC KEY BLOCK-----
-Version: OpenPGP.js v.1.2024
-
-mQINBGBz9bEBEAC+...
-[REDACTED FOR BREVITY]
-=7x3X
------END PGP PUBLIC KEY BLOCK-----`;
-
 const personSchema = JSON.stringify({
   "@context": "https://schema.org",
   "@type": "Person",
@@ -24,6 +16,63 @@ const personSchema = JSON.stringify({
   "jobTitle": "Security Researcher & Bug Bounty Hunter",
   "knowsAbout": ["Cybersecurity", "Bug Bounty", "Web Security", "Exploit Development"]
 });
+
+const skills = [
+  {
+    id: 'web-security',
+    label: 'WEB_SEC',
+    heading: 'Web Security',
+    icon: 'mingcute:web-line',
+    desc: 'XSS, SQLi, SSRF, IDOR, deserialization, WAF bypass, and complex logic flaws in modern web stacks.',
+    color: '#a855f7',
+    glow: 'rgba(168,85,247,0.15)',
+  },
+  {
+    id: 'api-security',
+    label: 'API_SEC',
+    heading: 'API Security',
+    icon: 'mingcute:link-line',
+    desc: 'REST & GraphQL attack surfaces, broken object-level auth, mass assignment, and JWT manipulation.',
+    color: '#22c55e',
+    glow: 'rgba(34,197,94,0.12)',
+  },
+  {
+    id: 'web3-security',
+    label: 'WEB3_SEC',
+    heading: 'Web3 Security',
+    icon: 'mingcute:cube-3d-line',
+    desc: 'Smart contract auditing, reentrancy, flash loan exploits, and DeFi protocol vulnerability research.',
+    color: '#eab308',
+    glow: 'rgba(234,179,8,0.12)',
+  },
+  {
+    id: 'android-security',
+    label: 'ANDROID_SEC',
+    heading: 'Android Security',
+    icon: 'mingcute:android-2-line',
+    desc: 'APK reversing, deep-link hijacking, exported component abuse, and traffic interception on mobile targets.',
+    color: '#f43f5e',
+    glow: 'rgba(244,63,94,0.12)',
+  },
+  {
+    id: 'game-dev',
+    label: 'GAME_DEV',
+    heading: 'Game Development',
+    icon: 'mingcute:gamepad-line',
+    desc: 'Building interactive experiences with a hacker mindset — from game mechanics to cheat-resistant architectures.',
+    color: '#c084fc',
+    glow: 'rgba(192,132,252,0.12)',
+  },
+  {
+    id: 'app-dev',
+    label: 'APP_DEV',
+    heading: 'App Development',
+    icon: 'mingcute:code-line',
+    desc: 'Full-stack and mobile app development with a security-first philosophy baked in from day one.',
+    color: '#22c55e',
+    glow: 'rgba(34,197,94,0.10)',
+  },
+];
 ---
 
 <BaseLayout
@@ -33,6 +82,7 @@ const personSchema = JSON.stringify({
   <script type="application/ld+json" set:html={personSchema} slot="head" />
   
   <main class="max-w-4xl mx-auto px-4 py-24">
+    <!-- Identity + Bio -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-12 mb-24">
       <div class="md:col-span-1">
         <div class="aspect-square bg-brand-bgHover border-4 border-brand-border p-2 retro-shadow-lg mb-6">
@@ -68,20 +118,39 @@ const personSchema = JSON.stringify({
       </div>
     </div>
 
-    <!-- PGP Key Block -->
+    <!-- Skill Tiles -->
     <div class="mb-24">
-      <SectionHeader label="// SECURE COMM" heading="ENCRYPTION KEY" />
-      <RetroCard class="p-6 md:p-8">
-        <div class="flex justify-between items-center mb-4">
-          <span class="font-space text-xs text-brand-textFaint tracking-widest">RSA 4096-BIT / FINGERPRINT: 4B3A...991F</span>
-          <button id="copy-pgp" class="font-space text-xs text-brand-purpleLight hover:text-brand-purple border border-brand-border px-3 py-1 transition-colors">
-            [COPY KEY]
-          </button>
-        </div>
-        <div class="bg-brand-bgDeep border-2 border-brand-border p-4 overflow-x-auto">
-          <pre class="font-mono text-xs text-brand-green leading-relaxed" id="pgp-content">{pgpKey}</pre>
-        </div>
-      </RetroCard>
+      <SectionHeader label="// CAPABILITIES" heading="SKILL MATRIX" />
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+        {skills.map((skill) => (
+          <div
+            class="skill-tile group relative border-2 border-brand-border bg-brand-bgCard p-6 retro-shadow transition-all duration-200 cursor-default"
+            data-color={skill.color}
+            data-glow={skill.glow}
+          >
+            <div class="accent-bar absolute top-0 left-0 right-0 h-[3px]" style={`background: ${skill.color};`}></div>
+
+            <div
+              class="w-12 h-12 border-2 border-brand-border flex items-center justify-center mb-4"
+              style={`background: ${skill.glow};`}
+            >
+              <iconify-icon icon={skill.icon} width="24" height="24" style={`color: ${skill.color};`}></iconify-icon>
+            </div>
+
+            <div class="font-vhs text-xs tracking-widest mb-1" style={`color: ${skill.color};`}>
+              {`// ${skill.label}`}
+            </div>
+
+            <h3 class="font-pixel text-sm text-brand-textPrimary mb-3 leading-snug">{skill.heading}</h3>
+
+            <p class="font-mono text-xs text-brand-textMuted leading-relaxed">{skill.desc}</p>
+
+            <div class="absolute bottom-3 right-3 font-pixel text-[8px] text-brand-textFaint opacity-60">
+              [{skill.id.toUpperCase()}]
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
 
     <!-- Contact Form -->
@@ -92,22 +161,27 @@ const personSchema = JSON.stringify({
   </main>
 </BaseLayout>
 
-<script>
-  const copyBtn = document.getElementById('copy-pgp');
-  const pgpContent = document.getElementById('pgp-content');
-
-  if (copyBtn && pgpContent) {
-    copyBtn.addEventListener('click', async () => {
-      try {
-        await navigator.clipboard.writeText(pgpContent.textContent || '');
-        const originalText = copyBtn.innerText;
-        copyBtn.innerText = '[COPIED!]';
-        setTimeout(() => {
-          copyBtn.innerText = originalText;
-        }, 2000);
-      } catch (err) {
-        console.error('Failed to copy text: ', err);
-      }
-    });
+<style>
+  .skill-tile {
+    transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease, border-color 0.15s ease;
   }
+  .skill-tile:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0px #1a0a2e;
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('.skill-tile').forEach(tile => {
+    const color = tile.dataset.color ?? '#a855f7';
+    const glow  = tile.dataset.glow  ?? 'rgba(168,85,247,0.15)';
+    tile.addEventListener('mouseenter', () => {
+      tile.style.background    = glow;
+      tile.style.borderColor   = color;
+    });
+    tile.addEventListener('mouseleave', () => {
+      tile.style.background    = '';
+      tile.style.borderColor   = '';
+    });
+  });
 </script>

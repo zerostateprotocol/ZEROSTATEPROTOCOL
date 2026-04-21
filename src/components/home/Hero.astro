@@ -2,6 +2,7 @@
 import TerminalWindow from '../ui/TerminalWindow.astro';
 import StatBlock from '../ui/StatBlock.astro';
 import RetroButton from '../ui/RetroButton.astro';
+import ZSPLogo from '../ui/ZSPLogo.astro';
 
 const terminalLines = [
   { text: 'brahma@zsp:~$ ./recon.sh --target megacorp.com', color: 'text-brand-textPrimary' },
@@ -37,15 +38,19 @@ const terminalLines = [
         <RetroButton href={`${import.meta.env.BASE_URL}about`} variant="ghost">ABOUT BRAHMA</RetroButton>
       </div>
       
-      <div class="grid grid-cols-3 gap-4 pt-12">
-        <StatBlock value="150+" label="Bounties" />
-        <StatBlock value="$1M+" label="Awarded" />
-        <StatBlock value="10+" label="0-Days" />
+      <div class="grid grid-cols-2 gap-4 pt-12">
+        <StatBlock value="50+" label="Bounties" />
+        <StatBlock value="$30K+" label="Awarded" />
       </div>
     </div>
     
     <div class="hidden lg:block relative">
+      <!-- Purple glow blob -->
       <div class="absolute -inset-4 bg-brand-purple/20 blur-3xl rounded-full"></div>
+      <!-- ZSP logo as large glowing watermark, centered behind terminal -->
+      <div class="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
+        <ZSPLogo size="w-80 h-80" class="opacity-10" style="filter: invert(0%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(0.4) contrast(1);" />
+      </div>
       <TerminalWindow lines={terminalLines} class="relative z-10" />
     </div>
 

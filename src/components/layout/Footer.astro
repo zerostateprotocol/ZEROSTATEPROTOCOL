@@ -1,5 +1,6 @@
 ---
 import RetroButton from '../ui/RetroButton.astro';
+import ZSPLogo from '../ui/ZSPLogo.astro';
 
 const year = new Date().getFullYear();
 ---
@@ -8,9 +9,9 @@ const year = new Date().getFullYear();
     <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
       <div class="md:col-span-2 space-y-4">
         <a href={import.meta.env.BASE_URL} class="inline-flex items-center gap-3">
-          <div class="w-8 h-8 bg-brand-textDim pixel-border flex items-center justify-center">
-            <span class="font-pixel text-brand-bg text-[10px]">ZS</span>
-          </div>
+          <div class="w-10 h-10 bg-brand-purple pixel-border flex items-center justify-center p-1.5">
+              <ZSPLogo size="w-full h-full" />
+            </div>
           <span class="font-pixel text-brand-textMuted text-xs tracking-widest">ZERO STATE PROTOCOL</span>
         </a>
         <p class="font-mono text-sm text-brand-textFaint">
@@ -31,9 +32,9 @@ const year = new Date().getFullYear();
       <div>
         <h3 class="font-space text-brand-purpleLight font-bold tracking-widest mb-4">SOCIAL</h3>
         <ul class="space-y-2 font-mono text-sm text-brand-textMuted">
-          <li><a href="#" class="hover:text-brand-purple transition-colors flex items-center gap-2"><iconify-icon icon="ri:twitter-x-fill"></iconify-icon> Twitter / X</a></li>
-          <li><a href="#" class="hover:text-brand-purple transition-colors flex items-center gap-2"><iconify-icon icon="ri:github-fill"></iconify-icon> GitHub</a></li>
-          <li><a href="#" class="hover:text-brand-purple transition-colors flex items-center gap-2"><iconify-icon icon="ri:key-fill"></iconify-icon> PGP Key</a></li>
+          <li><a href="https://x.com/ZeroStateProto" target="_blank" rel="noopener noreferrer" class="hover:text-brand-purple transition-colors flex items-center gap-2"><iconify-icon icon="ri:twitter-x-fill"></iconify-icon> Twitter / X</a></li>
+          <li><a href="https://github.com/zerostateprotocol" target="_blank" rel="noopener noreferrer" class="hover:text-brand-purple transition-colors flex items-center gap-2"><iconify-icon icon="ri:github-fill"></iconify-icon> GitHub</a></li>
+          <li><a href="https://in.linkedin.com/in/brahma-86a2a0169" target="_blank" rel="noopener noreferrer" class="hover:text-brand-purple transition-colors flex items-center gap-2"><iconify-icon icon="ri:linkedin-fill"></iconify-icon> LinkedIn</a></li>
         </ul>
       </div>
     </div>

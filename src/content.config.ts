@@ -29,6 +29,7 @@ const tools = defineCollection({
     free:        z.boolean().default(true),
     tags:        z.array(z.string()).default([]),
     featured:    z.boolean().default(false),
+    comingSoon:  z.boolean().default(false),
   }),
 });
 

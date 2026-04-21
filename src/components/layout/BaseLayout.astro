@@ -4,6 +4,7 @@ import Nav from './Nav.astro';
 import MobileMenu from './MobileMenu.astro';
 import MarqueeBanner from './MarqueeBanner.astro';
 import Footer from './Footer.astro';
+import NewsletterModal from '../ui/NewsletterModal.astro';
 
 interface Props {
   title: string;
@@ -20,7 +21,7 @@ const { title, description, ogImage = '/og-default.png', canonical } = Astro.pro
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
-    <link rel="icon" type="image/x-icon" href={`${import.meta.env.BASE_URL}favicon.ico`} />
+    <link rel="icon" type="image/svg+xml" href={`${import.meta.env.BASE_URL}favicon.svg`} />
     <meta name="generator" content={Astro.generator} />
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -60,6 +61,7 @@ const { title, description, ogImage = '/og-default.png', canonical } = Astro.pro
     </main>
     
     <Footer />
+    <NewsletterModal />
     
     <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
   </body>

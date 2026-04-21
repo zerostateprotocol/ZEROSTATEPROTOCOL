@@ -4,9 +4,10 @@ interface Props {
   href?: string;
   type?: 'button' | 'submit' | 'reset';
   class?: string;
+  [key: string]: any;
 }
 
-const { variant = 'primary', href, type, class: className = '' } = Astro.props;
+const { variant = 'primary', href, type, class: className = '', ...rest } = Astro.props;
 
 const baseStyles = "retro-btn px-6 py-3 font-space uppercase tracking-wider inline-block text-center cursor-pointer";
 const variantStyles = variant === 'primary' 
@@ -16,11 +17,11 @@ const variantStyles = variant === 'primary'
 const classes = `${baseStyles} ${variantStyles} ${className}`;
 ---
 {href ? (
-  <a href={href} class={classes}>
+  <a href={href} class={classes} {...rest}>
     <slot />
   </a>
 ) : (
-  <button type={type} class={classes}>
+  <button type={type} class={classes} {...rest}>
     <slot />
   </button>
 )}
