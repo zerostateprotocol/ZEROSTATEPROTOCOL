@@ -1,8 +1,8 @@
 ---
-title: "Out-of-Scope APK in a Public S3 Bucket Led to OAuth Client Takeover — $2,000"
+title: "Out-of-Scope APK in a Public S3 Bucket Led to OAuth Client Takeover — $10,000"
 severity: HIGH
 category: "Hardcoded Secrets"
-bountyAmount: 2000
+bountyAmount: 10000
 date: 2026-04-21
 program: "[REDACTED] Bug Bounty Program"
 featured: true
@@ -17,7 +17,7 @@ Burp was running while I walked through a subscription flow on an in-scope domai
 
 > The APK was out of scope. The live credentials inside it were not.
 
-**Bounty: $2,000**
+**Bounty: $10,000**
 
 ---
 
@@ -127,7 +127,7 @@ Pull any one of these and the chain breaks.
 | PoC | Live Bearer token minted, JWT decoded |
 | Report | Chain documented and filed |
 | Triage | Confirmed HIGH severity |
-| **Bounty** | **$2,000** |
+| **Bounty** | **$10,000** |
 | Fix | Credentials rotated, APK removed |
 
 ---
